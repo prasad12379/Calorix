@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background">
+
+    <!-- Header with Shadow -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/chatHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="12dp"
+        app:cardCornerRadius="0dp"
+        android:backgroundTint="#00000000">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/chat_header_gradient"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="24dp">
+
+            <!-- Title Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- AI Avatar with Pulse Animation -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <!-- Outer Glow Ring -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="62dp"
+                        android:layout_height="62dp"
+                        app:cardCornerRadius="31dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#254CAF50"
+                        android:layout_gravity="center"
+                        android:alpha="0.6"/>
+
+                    <!-- Middle Ring -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#354CAF50"
+                        android:layout_gravity="center"
+                        android:alpha="0.8"/>
+
+                    <!-- Avatar Circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="25dp"
+                        app:cardElevation="6dp"
+                        android:backgroundTint="#4CAF50">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_robot"
+                            app:tint="#FFFFFF"/>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Online Indicator with Shadow -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginBottom="2dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="3dp"
+                        android:backgroundTint="#4CAF50">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/online_indicator"/>
+                    </androidx.cardview.widget.CardView>
+
+                </FrameLayout>
+
+                <!-- Title Text -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Fitness Coach"
+                        android:textSize="23sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.01"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:background="@drawable/pulse_dot"/>
+
+                        <TextView
+                            android:id="@+id/tvBotStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active now"
+                            android:textSize="13sp"
+                            android:textColor="#CCFFFFFF"
+                            android:layout_marginStart="7dp"
+                            android:fontFamily="sans-serif"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Info Button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btnChatInfo"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    app:cardCornerRadius="21dp"
+                    app:cardElevation="3dp"
+                    android:backgroundTint="#35FFFFFF">
+
+                    <ImageView
+                        android:layout_width="21dp"
+                        android:layout_height="21dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_info"
+                        app:tint="#FFFFFF"/>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Chat Container -->
+    <FrameLayout
+        android:id="@+id/chatContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/chatHeader"
+        android:layout_above="@id/inputContainer">
+
+        <!-- Chat Messages RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChatMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:visibility="gone"/>
+
+        <!-- Empty State -->
+        <ScrollView
+            android:id="@+id/emptyStateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="40dp"
+                android:paddingBottom="40dp">
+
+                <!-- Animated AI Icon with Gradient Rings -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="36dp">
+
+                    <!-- Outer Ring with Pulse -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="75dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#184CAF50"
+                        android:layout_gravity="center"
+                        android:alpha="0.5"/>
+
+                    <!-- Middle Ring -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="130dp"
+                        android:layout_height="130dp"
+                        app:cardCornerRadius="65dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#284CAF50"
+                        android:layout_gravity="center"
+                        android:alpha="0.7"/>
+
+                    <!-- Inner Ring -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        app:cardCornerRadius="55dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#384CAF50"
+                        android:layout_gravity="center"
+                        android:alpha="0.9"/>
+
+                    <!-- AI Avatar -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="95dp"
+                        android:layout_height="95dp"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="47.5dp"
+                        app:cardElevation="12dp"
+                        android:backgroundTint="#4CAF50">
+
+                        <ImageView
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_robot"
+                            app:tint="#FFFFFF"/>
+                    </androidx.cardview.widget.CardView>
+
+                </FrameLayout>
+
+                <!-- Welcome Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hello! I'm Your"
+                    android:textSize="19sp"
+                    android:textColor="#CCFFFFFF"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI Fitness Coach 💪"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="14dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.01"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="I can help you with workout plans, nutrition advice, running tips, and answer any fitness questions you have!"
+                    android:textSize="15.5sp"
+                    android:textColor="#CCFFFFFF"
+                    android:gravity="center"
+                    android:lineSpacingExtra="5dp"
+                    android:layout_marginBottom="36dp"
+                    android:fontFamily="sans-serif"/>
+
+                <!-- Suggestions Title with Decorative Lines -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="18dp">
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="2dp"
+                        android:background="@drawable/gradient_line"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="  Try asking me  "
+                        android:textSize="13.5sp"
+                        android:textColor="#99FFFFFF"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="2dp"
+                        android:background="@drawable/gradient_line"/>
+
+                </LinearLayout>
+
+                <!-- Suggestion Cards with Enhanced Design -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/chipSuggestion1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14dp"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="6dp"
+                    android:backgroundTint="#35FFFFFF"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="18dp"
+                        android:gravity="center_vertical">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            android:backgroundTint="#254CAF50">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="💪"
+                                android:textSize="24sp"
+                                android:gravity="center"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Improve Running"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="How to improve my running speed?"
+                                android:textColor="#CCFFFFFF"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="#99FFFFFF"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/chipSuggestion2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14dp"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="6dp"
+                    android:backgroundTint="#35FFFFFF"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="18dp"
+                        android:gravity="center_vertical">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            android:backgroundTint="#25FF7043">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="🥗"
+                                android:textSize="24sp"
+                                android:gravity="center"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nutrition Advice"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="What should I eat after a workout?"
+                                android:textColor="#CCFFFFFF"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="#99FFFFFF"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/chipSuggestion3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="6dp"
+                    android:backgroundTint="#35FFFFFF"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="18dp"
+                        android:gravity="center_vertical">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            android:backgroundTint="#2564B5F6">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="🎯"
+                                android:textSize="24sp"
+                                android:gravity="center"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Workout Plan"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Create a custom workout plan for me"
+                                android:textColor="#CCFFFFFF"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="#99FFFFFF"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Typing Indicator with Enhanced Design -->
+        <LinearLayout
+            android:id="@+id/typingIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#35FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:gravity="center">
+
+                    <View
+                        android:id="@+id/dot1"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_marginEnd="7dp"
+                        android:background="@drawable/typing_dot"/>
+
+                    <View
+                        android:id="@+id/dot2"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_marginEnd="7dp"
+                        android:background="@drawable/typing_dot"/>
+
+                    <View
+                        android:id="@+id/dot3"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:background="@drawable/typing_dot"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Input Container with Enhanced Shadow -->
+    <LinearLayout
+        android:id="@+id/inputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:background="@drawable/chat_input_background"
+        android:elevation="18dp">
+
+        <!-- Input Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="18dp"
+            android:gravity="center_vertical">
+
+            <!-- Voice Input Button -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnVoice"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="12dp"
+                app:cardCornerRadius="26dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="#35FFFFFF"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_mic"
+                    app:tint="#FFFFFF"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Input Field Container with Enhanced Design -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="12dp"
+                app:cardCornerRadius="26dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#45FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <EditText
+                        android:id="@+id/etMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Type your message..."
+                        android:textColorHint="#99FFFFFF"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15.5sp"
+                        android:background="@android:color/transparent"
+                        android:padding="12dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="10dp"
+                        android:maxLines="5"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:scrollbars="vertical"
+                        android:fontFamily="sans-serif"/>
+
+                    <!-- Emoji Button -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnEmoji"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        app:cardCornerRadius="19dp"
+                        app:cardElevation="0dp"
+                        android:backgroundTint="#25FFFFFF"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_emoji"
+                            app:tint="#CCFFFFFF"/>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Send Button with Enhanced Design -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnSend"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                app:cardCornerRadius="26dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#4CAF50"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_send"
+                    app:tint="#FFFFFF"/>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

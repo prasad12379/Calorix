@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginBottom="16dp"
+    android:paddingStart="60dp"
+    android:paddingEnd="8dp"
+    android:gravity="end">
+
+    <!-- Message Content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <!-- User Name -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You"
+            android:textSize="11sp"
+            android:textColor="#B3FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- Message Bubble - NOW DYNAMIC -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="#4CAF50">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp">
+
+                <TextView
+                    android:id="@+id/tvUserMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="How can I improve my 5K running time?"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="2dp"
+                    android:maxWidth="280dp"
+                    android:breakStrategy="balanced"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Timestamp & Status -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvUserTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Just now"
+                android:textSize="10sp"
+                android:textColor="#60FFFFFF"/>
+
+            <!-- Read Status -->
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_check_double"
+                app:tint="#4CAF50"
+                android:layout_marginStart="4dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- User Avatar -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
+        android:backgroundTint="#667eea">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_profile"
+            app:tint="#FFFFFF"/>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
