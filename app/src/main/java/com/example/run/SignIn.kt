@@ -76,9 +76,19 @@ class SignInActivity : AppCompatActivity() {
                     ).show()
 
                     // 🚀 START MAIN ACTIVITY AFTER SUCCESS LOGIN
+                    val userEmail = response.body()!!.email
+
+// ⭐ SAVE EMAIL GLOBALLY
+                    val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                    val editor = sharedPref.edit()
+                    editor.putString("email", userEmail)
+                    editor.apply()
+
+// 🚀 OPEN MAIN ACTIVITY
                     val intent = Intent(this@SignInActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
+
 
                 } else {
                     Toast.makeText(

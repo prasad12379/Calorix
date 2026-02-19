@@ -1,5 +1,6 @@
 package com.example.run
 
+import UserResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -22,6 +23,11 @@ interface ApiInterface {
     fun signinUser(
         @Body signinRequest: SigninRequest
     ): Call<SigninResponse>
+
+    @GET("user")
+    fun getUser(
+        @Query("email") email: String
+    ): Call<UserResponse>
 
 
 }
