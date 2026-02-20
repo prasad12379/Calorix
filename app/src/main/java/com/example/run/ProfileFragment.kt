@@ -2,12 +2,12 @@ package com.example.run
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
@@ -33,7 +33,7 @@ class ProfileFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-        // 🔥 Bind XML Views
+        // 🔥 Bind Views from XML
         tvUserName = view.findViewById(R.id.tvUserName)
         tvUserEmail = view.findViewById(R.id.tvUserEmail)
         tvMemberSince = view.findViewById(R.id.tvMemberSince)
@@ -42,16 +42,12 @@ class ProfileFragment : Fragment() {
         tvAge = view.findViewById(R.id.tvAge)
 
         initRetrofit()
-
-        // ✅ FIRST TRY LOADING FROM CACHE
-        if (!loadProfileFromCache()) {
-            loadUserProfile()
-        }
+        loadUserProfile()
 
         return view
     }
 
-    // 🔥 Retrofit Init (same base URL)
+    // ✅ SAME BASE URL AS YOUR OTHER SCREENS
     private fun initRetrofit() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://running-app-backend-p48y.onrender.com/")
@@ -61,35 +57,13 @@ class ProfileFragment : Fragment() {
         apiInterface = retrofit.create(ApiInterface::class.java)
     }
 
-    // ✅ LOAD PROFILE FROM LOCAL CACHE
-    private fun loadProfileFromCache(): Boolean {
-
-        val pref = requireContext()
-            .getSharedPreferences("USER_PROFILE", Context.MODE_PRIVATE)
-
-        val name = pref.getString("name", null)
-
-        // ❌ No cache found → call API
-        if (name == null) return false
-
-        // ✅ Set UI from cache
-        tvUserName.text = name
-        tvUserEmail.text = pref.getString("email", "")
-        tvHeight.text = "${pref.getInt("height", 0)} cm"
-        tvWeight.text = "${pref.getInt("weight", 0)} kg"
-        tvAge.text = "${pref.getInt("age", 0)} years"
-        tvMemberSince.text = pref.getString("member_since", "")
-
-        return true
-    }
-
-    // 🚀 CALL FASTAPI USING STORED EMAIL
+    // 🚀 CALL BACKEND USING STORED EMAIL
     private fun loadUserProfile() {
 
-        val sessionPref = requireContext()
+        val sharedPref = requireContext()
             .getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
 
-        val email = sessionPref.getString("email", null)
+        val email = sharedPref.getString("email", null)
 
         if (email == null) {
             Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
@@ -104,36 +78,18 @@ class ProfileFragment : Fragment() {
                 call: Call<UserResponse>,
                 response: Response<UserResponse>
             ) {
-
                 if (response.isSuccessful && response.body() != null) {
 
                     val user = response.body()!!.data
 
-                    // ✅ Update UI
                     tvUserName.text = user.name
                     tvUserEmail.text = user.email
                     tvHeight.text = "${user.height} cm"
                     tvWeight.text = "${user.weight} kg"
                     tvAge.text = "${user.age} years"
 
-                    val memberSince =
+                    tvMemberSince.text =
                         "Member since ${formatDate(user.created_at)}"
-
-                    tvMemberSince.text = memberSince
-
-                    // 🔥 SAVE TO CACHE (VERY IMPORTANT)
-                    val pref = requireContext()
-                        .getSharedPreferences("USER_PROFILE", Context.MODE_PRIVATE)
-
-                    pref.edit().apply {
-                        putString("name", user.name)
-                        putString("email", user.email)
-                        putInt("height", user.height)
-                        putInt("weight", user.weight)
-                        putInt("age", user.age)
-                        putString("member_since", memberSince)
-                        apply()
-                    }
 
                 } else {
                     Toast.makeText(
@@ -154,7 +110,7 @@ class ProfileFragment : Fragment() {
         })
     }
 
-    // 📅 Format Date → Feb 2026
+    // 📅 Convert backend datetime → "Feb 2026"
     private fun formatDate(dateStr: String): String {
         return try {
             val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())

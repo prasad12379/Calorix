@@ -23,10 +23,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="RunTracker"
-                android:textSize="24sp"
+                android:text="CaloriX"
+                android:textSize="25sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
+                android:textColor="#22D3EE"
                 android:fontFamily="sans-serif-medium"/>
 
             <ImageView
@@ -51,14 +51,15 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
+                android:background="@drawable/glass_card_background"
                 android:gravity="center">
 
                 <TextView
@@ -97,14 +98,15 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
+                    android:background="@drawable/glass_card_background"
                     android:padding="16dp">
 
                     <ImageView
@@ -140,14 +142,16 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
+                    android:background="@drawable/glass_card_background"
+
                     android:padding="16dp">
 
                     <ImageView
@@ -182,14 +186,17 @@
                 android:layout_height="140dp"
                 android:layout_weight="1"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
+                    android:background="@drawable/glass_card_background"
+
                     android:padding="16dp">
 
                     <ImageView
@@ -367,7 +374,7 @@
             android:layout_marginBottom="16dp"
             app:cardCornerRadius="35dp"
             app:cardElevation="8dp"
-            android:backgroundTint="#4CAF50">
+            android:backgroundTint="#1E4ED8">
 
             <LinearLayout
                 android:layout_width="match_parent"

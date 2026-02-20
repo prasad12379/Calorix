@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.run.HomeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -15,6 +17,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+
+        // ✅ Handle system navigation bar padding (VERY IMPORTANT)
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { view, insets ->
+            val navBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                navBarInsets.bottom + 8   // adds space above system nav
+            )
+            insets
+        }
 
         // Default fragment
         loadFragment(HomeFragment())
@@ -28,7 +42,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
     }
 
     private fun loadFragment(fragment: Fragment) {

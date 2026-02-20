@@ -17,11 +17,13 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:background="@drawable/glass_card_background"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
@@ -55,7 +57,7 @@
                     android:layout_marginStart="80dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="4dp"
-                    android:backgroundTint="#4CAF50">
+                    android:backgroundTint="#1E4ED8">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -99,142 +101,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Statistics Grid -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_marginBottom="20dp">
-
-            <!-- Total Workouts -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_running"
-                        app:tint="#64B5F6"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvTotalWorkouts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="42"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Workouts"
-                        android:textSize="11sp"
-                        android:textColor="#B3FFFFFF"
-                        android:layout_marginTop="2dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Total Distance -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_distance"
-                        app:tint="#FF7043"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvTotalDistance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="156"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="km"
-                        android:textSize="11sp"
-                        android:textColor="#B3FFFFFF"
-                        android:layout_marginTop="2dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Total Calories -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_weight="1"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:background="@drawable/glass_card_background">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_calories"
-                        app:tint="#AB47BC"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvTotalCalories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="9360"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="kcal"
-                        android:textSize="11sp"
-                        android:textColor="#B3FFFFFF"
-                        android:layout_marginTop="2dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
 
         <!-- Personal Info Section -->
         <TextView
@@ -254,13 +120,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
@@ -310,14 +179,17 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
+                android:background="@drawable/glass_card_background"
+
                 android:gravity="center_vertical">
 
                 <ImageView
@@ -366,14 +238,17 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
+                android:background="@drawable/glass_card_background"
+
                 android:gravity="center_vertical">
 
                 <ImageView
@@ -433,13 +308,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
@@ -473,13 +351,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
@@ -513,13 +394,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
@@ -553,13 +437,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
@@ -593,13 +480,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:background="@drawable/glass_card_background">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@drawable/glass_card_background"
+
                 android:padding="16dp"
                 android:gravity="center_vertical">
 

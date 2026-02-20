@@ -7,10 +7,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import retrofit2.*
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
+import ActivityRequest
 
 class WorkoutSummaryActivity : AppCompatActivity() {
+
+    // ✅ MUST BE INSIDE CLASS
+    private lateinit var apiInterface: ApiInterface
 
     private lateinit var tvWorkoutType: TextView
     private lateinit var tvWorkoutDate: TextView
@@ -27,7 +33,6 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     private lateinit var btnShare: CardView
     private lateinit var btnViewFullMap: CardView
 
-    // Workout data
     private var workoutMode = ""
     private var duration = ""
     private var distance = ""
@@ -38,10 +43,24 @@ class WorkoutSummaryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout_summary)
 
+        // ✅ Initialize Retrofit FIRST
+        initRetrofit()
+
         initViews()
         getDataFromIntent()
         displayData()
         setupListeners()
+    }
+
+    // ⭐ Retrofit Setup (OUTSIDE onCreate)
+    private fun initRetrofit() {
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://running-app-backend-p48y.onrender.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        apiInterface = retrofit.create(ApiInterface::class.java)
     }
 
     private fun initViews() {
@@ -70,7 +89,7 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     }
 
     private fun displayData() {
-        // Set workout type
+
         tvWorkoutType.text = when(workoutMode) {
             "RUNNING" -> "Morning Run"
             "WALKING" -> "Walking Session"
@@ -78,21 +97,15 @@ class WorkoutSummaryActivity : AppCompatActivity() {
             else -> "Workout"
         }
 
-        // Set current date and time
         val dateFormat = SimpleDateFormat("EEEE, h:mm a", Locale.getDefault())
-        val currentDateTime = dateFormat.format(Date())
-        tvWorkoutDate.text = currentDateTime
+        tvWorkoutDate.text = dateFormat.format(Date())
 
-        // Set main stats
         tvSummaryTime.text = duration
         tvSummaryDistance.text = distance
         tvSummaryCalories.text = calories
         tvSummaryPace.text = pace
 
-        // Calculate best pace (approximately 10% faster than average)
         calculateBestPace()
-
-        // Calculate estimated steps
         calculateEstimatedSteps()
     }
 
@@ -100,12 +113,10 @@ class WorkoutSummaryActivity : AppCompatActivity() {
         try {
             val parts = pace.split(":")
             if (parts.size == 2) {
-                val minutes = parts[0].toInt()
-                val seconds = parts[1].toInt()
-                val totalSeconds = (minutes * 60 + seconds) * 0.9 // 10% faster
-                val bestMin = (totalSeconds / 60).toInt()
-                val bestSec = (totalSeconds % 60).toInt()
-                tvMaxSpeed.text = String.format("%d:%02d", bestMin, bestSec)
+                val totalSeconds =
+                    (parts[0].toInt() * 60 + parts[1].toInt()) * 0.9
+                tvMaxSpeed.text =
+                    "%d:%02d".format((totalSeconds/60).toInt(), (totalSeconds%60).toInt())
             }
         } catch (e: Exception) {
             tvMaxSpeed.text = "N/A"
@@ -114,9 +125,7 @@ class WorkoutSummaryActivity : AppCompatActivity() {
 
     private fun calculateEstimatedSteps() {
         try {
-            val distKm = distance.toDouble()
-            // Average: 1,300 steps per km
-            val steps = (distKm * 1300).toInt()
+            val steps = (distance.toDouble() * 1300).toInt()
             tvSteps.text = String.format("%,d", steps)
         } catch (e: Exception) {
             tvSteps.text = "0"
@@ -124,40 +133,70 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        btnSave.setOnClickListener {
-            saveWorkout()
-        }
 
-        btnDiscard.setOnClickListener {
-            showDiscardDialog()
-        }
+        btnSave.setOnClickListener { saveWorkout() }
 
-        btnShare.setOnClickListener {
-            shareWorkout()
-        }
+        btnDiscard.setOnClickListener { showDiscardDialog() }
+
+        btnShare.setOnClickListener { shareWorkout() }
 
         btnViewFullMap.setOnClickListener {
-            // TODO: Open full map view
             Toast.makeText(this, "Map view coming soon", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun saveWorkout() {
-        // TODO: Save to database
-        Toast.makeText(this, "Workout saved successfully!", Toast.LENGTH_SHORT).show()
 
-        // Return to home
-        finish()
+        val email = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+            .getString("email", null)
+
+        if (email == null) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val activity = ActivityRequest(
+            email,
+            workoutMode,
+            duration,
+            distance,
+            calories,
+            pace,
+            tvSteps.text.toString().replace(",", "").toIntOrNull() ?: 0,
+            tvMaxSpeed.text.toString(),
+            tvWorkoutDate.text.toString()
+        )
+
+        apiInterface.saveActivity(activity)
+            .enqueue(object : Callback<SimpleResponse> {
+
+                override fun onResponse(call: Call<SimpleResponse>, response: Response<SimpleResponse>) {
+
+                    if (response.isSuccessful && response.body() != null) {
+                        Toast.makeText(this@WorkoutSummaryActivity,
+                            response.body()!!.message,
+                            Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        Toast.makeText(this@WorkoutSummaryActivity,
+                            "Failed to save workout",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<SimpleResponse>, t: Throwable) {
+                    Toast.makeText(this@WorkoutSummaryActivity,
+                        "Network error: ${t.message}",
+                        Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     private fun showDiscardDialog() {
         AlertDialog.Builder(this)
             .setTitle("Discard Workout?")
-            .setMessage("Are you sure you want to discard this workout? This action cannot be undone.")
-            .setPositiveButton("Discard") { _, _ ->
-                Toast.makeText(this, "Workout discarded", Toast.LENGTH_SHORT).show()
-                finish()
-            }
+            .setMessage("Are you sure you want to discard this workout?")
+            .setPositiveButton("Discard") { _, _ -> finish() }
             .setNegativeButton("Cancel", null)
             .show()
     }
@@ -165,26 +204,20 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     private fun shareWorkout() {
         val shareText = """
             🏃 Workout Summary
-            
             Type: $workoutMode
             Time: $duration
             Distance: $distance km
             Calories: $calories kcal
             Avg Pace: $pace min/km
-            
-            #RunTracker #Fitness
         """.trimIndent()
 
-        val shareIntent = android.content.Intent().apply {
-            action = android.content.Intent.ACTION_SEND
-            type = "text/plain"
-            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
-        }
-
-        startActivity(android.content.Intent.createChooser(shareIntent, "Share Workout"))
+        startActivity(android.content.Intent.createChooser(
+            android.content.Intent().apply {
+                action = android.content.Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+            },
+            "Share Workout"
+        ))
     }
-
-    // Prevent back button
-
-
 }

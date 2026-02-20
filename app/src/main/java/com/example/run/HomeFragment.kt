@@ -76,7 +76,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         fun setGreen(card: CardView) {
             ViewCompat.setBackgroundTintList(
                 card,
-                ColorStateList.valueOf(Color.parseColor("#4CAF50"))
+                ColorStateList.valueOf(Color.parseColor("#1E4ED8"))
             )
         }
 
