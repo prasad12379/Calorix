@@ -13,6 +13,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 import UserResponse
+import android.content.Intent
+import android.net.Uri
+import androidx.cardview.widget.CardView
 
 class ProfileFragment : Fragment() {
 
@@ -43,6 +46,41 @@ class ProfileFragment : Fragment() {
 
         initRetrofit()
         loadUserProfile()
+
+        //about section intent
+        val cardNotification = view.findViewById<CardView>(R.id.cardNotifications)
+
+        cardNotification.setOnClickListener {
+
+            val intent = Intent(requireContext(), NotificationsActivity::class.java)
+            startActivity(intent)
+
+        }
+
+        //help and support intent
+        val cardHelp = view.findViewById<CardView>(R.id.cardHelp)
+
+        cardHelp.setOnClickListener {
+
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:") // only email apps open
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("dhokaneprasad6@gmail.com"))
+                putExtra(Intent.EXTRA_SUBJECT, "CaloriX App Support")
+                putExtra(Intent.EXTRA_TEXT, "Hello Prasad,\n\nI need help with CaloriX app.")
+            }
+
+            startActivity(intent)
+        }
+
+        //notification intent
+        val cardAbout = view.findViewById<CardView>(R.id.cardAbout)
+
+        cardAbout.setOnClickListener {
+
+            val intent = Intent(requireContext(), AboutActivity::class.java)
+            startActivity(intent)
+
+        }
 
         return view
     }

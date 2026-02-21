@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_profile"
+            app:tint="#667eea"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CaloriX"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 1.0.0"
+            android:textSize="14sp"
+            android:textColor="#80FFFFFF"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="32dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your personal running companion 🏃"
+            android:textSize="16sp"
+            android:textColor="#B3FFFFFF"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#33FFFFFF"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CaloriX helps you log your runs, track your progress, and hit your fitness goals — all from your pocket.\n\nTrack distance, pace, calories, and duration. Visualize trends over time and stay motivated every step of the way."
+            android:textSize="15sp"
+            android:textColor="#CCF0F0F0"
+            android:lineSpacingMultiplier="1.5"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#33FFFFFF"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Made with ❤️ by the Prasad"
+            android:textSize="13sp"
+            android:textColor="#80FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="dhokaneprasad6@gmail.com"
+            android:textSize="13sp"
+            android:textColor="#667eea"
+            android:layout_marginBottom="32dp"/>
+
+    </LinearLayout>
+</ScrollView>
