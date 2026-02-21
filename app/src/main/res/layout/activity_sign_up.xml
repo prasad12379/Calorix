@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Full Name"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#4CAF50"
+                app:boxStrokeColor="#1E4ED8"
                 app:hintTextColor="#B3FFFFFF"
                 app:boxCornerRadiusTopStart="16dp"
                 app:boxCornerRadiusTopEnd="16dp"
@@ -122,7 +122,7 @@
                 android:layout_marginTop="14dp"
                 android:hint="Email"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#4CAF50"
+                app:boxStrokeColor="#1E4ED8"
                 app:hintTextColor="#B3FFFFFF"
                 app:boxCornerRadiusTopStart="16dp"
                 app:boxCornerRadiusTopEnd="16dp"
@@ -149,7 +149,7 @@
                 android:layout_marginTop="14dp"
                 android:hint="Password"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#4CAF50"
+                app:boxStrokeColor="#1E4ED8"
                 app:hintTextColor="#B3FFFFFF"
                 app:boxCornerRadiusTopStart="16dp"
                 app:boxCornerRadiusTopEnd="16dp"
@@ -198,7 +198,7 @@
                     android:layout_marginEnd="8dp"
                     android:hint="Age"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:boxStrokeColor="#4CAF50"
+                    app:boxStrokeColor="#1E4ED8"
                     app:hintTextColor="#B3FFFFFF"
                     app:boxCornerRadiusTopStart="16dp"
                     app:boxCornerRadiusTopEnd="16dp"
@@ -227,7 +227,7 @@
                     android:layout_weight="1"
                     android:hint="Gender"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    app:boxStrokeColor="#4CAF50"
+                    app:boxStrokeColor="#1E4ED8"
                     app:hintTextColor="#B3FFFFFF"
                     app:boxCornerRadiusTopStart="16dp"
                     app:boxCornerRadiusTopEnd="16dp"
@@ -265,7 +265,7 @@
                     android:layout_marginEnd="8dp"
                     android:hint="Height"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:boxStrokeColor="#4CAF50"
+                    app:boxStrokeColor="#1E4ED8"
                     app:hintTextColor="#B3FFFFFF"
                     app:boxCornerRadiusTopStart="16dp"
                     app:boxCornerRadiusTopEnd="16dp"
@@ -294,7 +294,7 @@
                     android:layout_weight="1"
                     android:hint="Weight"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:boxStrokeColor="#4CAF50"
+                    app:boxStrokeColor="#1E4ED8"
                     app:hintTextColor="#B3FFFFFF"
                     app:boxCornerRadiusTopStart="16dp"
                     app:boxCornerRadiusTopEnd="16dp"
@@ -325,7 +325,7 @@
                 android:layout_marginTop="14dp"
                 android:hint="Fitness Goal"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                app:boxStrokeColor="#4CAF50"
+                app:boxStrokeColor="#1E4ED8"
                 app:hintTextColor="#B3FFFFFF"
                 app:boxCornerRadiusTopStart="16dp"
                 app:boxCornerRadiusTopEnd="16dp"
@@ -386,7 +386,18 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
+                    <!-- ✅ LOADING PROGRESS BAR (HIDDEN BY DEFAULT) -->
+                    <ProgressBar
+                        android:id="@+id/progressBarSignup"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:indeterminateTint="#FFFFFF"
+                        android:visibility="gone"
+                        style="@android:style/Widget.ProgressBar.Small"/>
+
+                    <!-- SIGN UP TEXT -->
                     <TextView
+                        android:id="@+id/tvSignUpText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CREATE ACCOUNT"
@@ -396,6 +407,7 @@
                         android:letterSpacing="0.1"/>
 
                     <ImageView
+                        android:id="@+id/ivArrowSignup"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_arrow_right"

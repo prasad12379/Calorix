@@ -14,7 +14,9 @@
         android:theme="@style/Theme.Run"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".CountdownActivity"
+            android:exported="false" />
         <activity
             android:name=".NotificationsActivity"
             android:exported="false" />
@@ -46,7 +48,6 @@
             android:name=".WorkoutSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
     </application>
 
 </manifest>

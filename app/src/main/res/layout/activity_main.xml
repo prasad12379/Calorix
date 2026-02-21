@@ -20,6 +20,7 @@
         android:layout_alignParentBottom="true"
 
         android:background="@drawable/glass_bottom_nav"
+        android:backgroundTint="@android:color/transparent"
         android:elevation="0dp"
 
         android:paddingTop="3dp"

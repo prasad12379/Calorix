@@ -1,5 +1,6 @@
 package com.example.run
 
+import UserResponse
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +13,6 @@ import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
-import UserResponse
 import android.content.Intent
 import android.net.Uri
 import androidx.cardview.widget.CardView
@@ -45,47 +45,46 @@ class ProfileFragment : Fragment() {
         tvAge = view.findViewById(R.id.tvAge)
 
         initRetrofit()
+
+        // ✅ LOAD FROM CACHE FIRST
         loadUserProfile()
 
-        //about section intent
+        // notification section intent
         val cardNotification = view.findViewById<CardView>(R.id.cardNotifications)
-
         cardNotification.setOnClickListener {
-
             val intent = Intent(requireContext(), NotificationsActivity::class.java)
             startActivity(intent)
-
         }
 
-        //help and support intent
+        // Help and support intent
         val cardHelp = view.findViewById<CardView>(R.id.cardHelp)
-
         cardHelp.setOnClickListener {
-
             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:") // only email apps open
+                data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("dhokaneprasad6@gmail.com"))
                 putExtra(Intent.EXTRA_SUBJECT, "CaloriX App Support")
                 putExtra(Intent.EXTRA_TEXT, "Hello Prasad,\n\nI need help with CaloriX app.")
             }
-
             startActivity(intent)
         }
 
-        //notification intent
+        // about intent
         val cardAbout = view.findViewById<CardView>(R.id.cardAbout)
-
         cardAbout.setOnClickListener {
-
             val intent = Intent(requireContext(), AboutActivity::class.java)
             startActivity(intent)
+        }
 
+        //logout
+        val btnLogout = view.findViewById<CardView>(R.id.btnLogout) // Add this button to your XML
+
+        btnLogout.setOnClickListener {
+            logoutUser()
         }
 
         return view
     }
 
-    // ✅ SAME BASE URL AS YOUR OTHER SCREENS
     private fun initRetrofit() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://running-app-backend-p48y.onrender.com/")
@@ -95,9 +94,44 @@ class ProfileFragment : Fragment() {
         apiInterface = retrofit.create(ApiInterface::class.java)
     }
 
-    // 🚀 CALL BACKEND USING STORED EMAIL
+    // 🚀 SMART LOADING: Cache First, API as Fallback
     private fun loadUserProfile() {
+        val sharedPref = requireContext()
+            .getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
 
+        val isCached = sharedPref.getBoolean("profile_cached", false)
+
+        if (isCached) {
+            // ✅ LOAD FROM CACHE (INSTANT, NO API CALL)
+            loadFromCache()
+        } else {
+            // ❌ CACHE EMPTY, FETCH FROM API
+            fetchFromAPI()
+        }
+    }
+
+    // 💾 LOAD DATA FROM SHARED PREFERENCES (INSTANT)
+    private fun loadFromCache() {
+        val sharedPref = requireContext()
+            .getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+
+        val name = sharedPref.getString("name", "N/A") ?: "N/A"
+        val email = sharedPref.getString("email", "N/A") ?: "N/A"
+        val height = sharedPref.getString("height", "0") ?: "0"
+        val weight = sharedPref.getString("weight", "0") ?: "0"
+        val age = sharedPref.getString("age", "0") ?: "0"
+        val createdAt = sharedPref.getString("created_at", "") ?: ""
+
+        tvUserName.text = name
+        tvUserEmail.text = email
+        tvHeight.text = "$height cm"
+        tvWeight.text = "$weight kg"
+        tvAge.text = "$age years"
+        tvMemberSince.text = "Member since ${formatDate(createdAt)}"
+    }
+
+    // 🌐 FETCH FROM API (ONLY IF CACHE IS EMPTY)
+    private fun fetchFromAPI() {
         val sharedPref = requireContext()
             .getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
 
@@ -111,23 +145,27 @@ class ProfileFragment : Fragment() {
         val call = apiInterface.getUser(email)
 
         call.enqueue(object : Callback<UserResponse> {
-
             override fun onResponse(
                 call: Call<UserResponse>,
                 response: Response<UserResponse>
             ) {
                 if (response.isSuccessful && response.body() != null) {
-
                     val user = response.body()!!.data
 
-                    tvUserName.text = user.name
-                    tvUserEmail.text = user.email
-                    tvHeight.text = "${user.height} cm"
-                    tvWeight.text = "${user.weight} kg"
-                    tvAge.text = "${user.age} years"
+                    // 💾 SAVE TO CACHE
+                    sharedPref.edit().apply {
+                        putString("name", user.name)
+                        putString("email", user.email)
+                        putString("height", user.height.toString())
+                        putString("weight", user.weight.toString())
+                        putString("age", user.age.toString())
+                        putString("created_at", user.created_at)
+                        putBoolean("profile_cached", true)
+                        apply()
+                    }
 
-                    tvMemberSince.text =
-                        "Member since ${formatDate(user.created_at)}"
+                    // 📱 DISPLAY DATA
+                    loadFromCache()
 
                 } else {
                     Toast.makeText(
@@ -158,5 +196,20 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             "N/A"
         }
+    }
+
+    private fun logoutUser() {
+        // Clear all cached data
+        val sharedPref = requireContext()
+            .getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+
+        sharedPref.edit().clear().apply()
+
+        // Navigate to SignIn
+        val intent = Intent(requireContext(), SignInActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+
+        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
     }
 }

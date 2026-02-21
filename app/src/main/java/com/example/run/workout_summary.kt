@@ -1,5 +1,6 @@
 package com.example.run
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,13 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import ActivityRequest
 
 class WorkoutSummaryActivity : AppCompatActivity() {
 
-    // ✅ MUST BE INSIDE CLASS
     private lateinit var apiInterface: ApiInterface
 
     private lateinit var tvWorkoutType: TextView
@@ -27,6 +28,8 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     private lateinit var tvMaxSpeed: TextView
     private lateinit var tvSteps: TextView
     private lateinit var ivRouteMap: ImageView
+    private lateinit var tvMapDistanceOverlay: TextView
+    private lateinit var tvWorkoutTypeOverlay: TextView
 
     private lateinit var btnSave: CardView
     private lateinit var btnDiscard: CardView
@@ -43,18 +46,15 @@ class WorkoutSummaryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout_summary)
 
-        // ✅ Initialize Retrofit FIRST
         initRetrofit()
-
         initViews()
         getDataFromIntent()
         displayData()
+        loadMapImage() // ✅ LOAD MAP SCREENSHOT
         setupListeners()
     }
 
-    // ⭐ Retrofit Setup (OUTSIDE onCreate)
     private fun initRetrofit() {
-
         val retrofit = Retrofit.Builder()
             .baseUrl("https://running-app-backend-p48y.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -73,6 +73,8 @@ class WorkoutSummaryActivity : AppCompatActivity() {
         tvMaxSpeed = findViewById(R.id.tvMaxSpeed)
         tvSteps = findViewById(R.id.tvSteps)
         ivRouteMap = findViewById(R.id.ivRouteMap)
+        tvMapDistanceOverlay = findViewById(R.id.tvMapDistanceOverlay)
+        tvWorkoutTypeOverlay = findViewById(R.id.tvWorkoutTypeOverlay)
 
         btnSave = findViewById(R.id.btnSave)
         btnDiscard = findViewById(R.id.btnDiscard)
@@ -89,7 +91,6 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     }
 
     private fun displayData() {
-
         tvWorkoutType.text = when(workoutMode) {
             "RUNNING" -> "Morning Run"
             "WALKING" -> "Walking Session"
@@ -105,18 +106,39 @@ class WorkoutSummaryActivity : AppCompatActivity() {
         tvSummaryCalories.text = calories
         tvSummaryPace.text = pace
 
+        // ✅ UPDATE MAP OVERLAY
+        tvMapDistanceOverlay.text = "$distance km route"
+        tvWorkoutTypeOverlay.text = workoutMode
+
         calculateBestPace()
         calculateEstimatedSteps()
+    }
+
+    // ✅ LOAD MAP SCREENSHOT FROM FILE
+    private fun loadMapImage() {
+        val mapImagePath = intent.getStringExtra("MAP_IMAGE_PATH")
+
+        if (mapImagePath != null) {
+            val file = File(mapImagePath)
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                ivRouteMap.setImageBitmap(bitmap)
+            } else {
+                // Show placeholder if file doesn't exist
+                ivRouteMap.setImageResource(R.drawable.ic_distance)
+            }
+        } else {
+            // Show placeholder if no map image
+            ivRouteMap.setImageResource(R.drawable.ic_distance)
+        }
     }
 
     private fun calculateBestPace() {
         try {
             val parts = pace.split(":")
             if (parts.size == 2) {
-                val totalSeconds =
-                    (parts[0].toInt() * 60 + parts[1].toInt()) * 0.9
-                tvMaxSpeed.text =
-                    "%d:%02d".format((totalSeconds/60).toInt(), (totalSeconds%60).toInt())
+                val totalSeconds = (parts[0].toInt() * 60 + parts[1].toInt()) * 0.9
+                tvMaxSpeed.text = "%d:%02d".format((totalSeconds/60).toInt(), (totalSeconds%60).toInt())
             }
         } catch (e: Exception) {
             tvMaxSpeed.text = "N/A"
@@ -133,20 +155,15 @@ class WorkoutSummaryActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-
         btnSave.setOnClickListener { saveWorkout() }
-
         btnDiscard.setOnClickListener { showDiscardDialog() }
-
         btnShare.setOnClickListener { shareWorkout() }
-
         btnViewFullMap.setOnClickListener {
             Toast.makeText(this, "Map view coming soon", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun saveWorkout() {
-
         val email = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
             .getString("email", null)
 
@@ -169,9 +186,7 @@ class WorkoutSummaryActivity : AppCompatActivity() {
 
         apiInterface.saveActivity(activity)
             .enqueue(object : Callback<SimpleResponse> {
-
                 override fun onResponse(call: Call<SimpleResponse>, response: Response<SimpleResponse>) {
-
                     if (response.isSuccessful && response.body() != null) {
                         Toast.makeText(this@WorkoutSummaryActivity,
                             response.body()!!.message,

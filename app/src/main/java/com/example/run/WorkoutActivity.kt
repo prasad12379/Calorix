@@ -3,6 +3,7 @@ package com.example.run
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -15,7 +16,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-
 import com.google.android.gms.location.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -24,6 +24,8 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.io.File
+import java.io.FileOutputStream
 
 class WorkoutActivity : AppCompatActivity() {
 
@@ -183,11 +185,10 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun startWorkout() {
         startTimer()
-        initializeFirstLocation() // 🔥 FIX: Get initial location first
+        initializeFirstLocation()
         startLocationTracking()
     }
 
-    // 🔥 NEW: Get initial location to start tracking
     private fun initializeFirstLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -227,10 +228,10 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun startLocationTracking() {
         val locationRequest = LocationRequest.create().apply {
-            interval = 5000 // 🔥 Changed to 5 seconds for better outdoor tracking
+            interval = 5000
             fastestInterval = 3000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            smallestDisplacement = 5f // 🔥 Only update if moved 5 meters
+            smallestDisplacement = 5f
         }
 
         locationCallback = object : LocationCallback() {
@@ -238,7 +239,6 @@ class WorkoutActivity : AppCompatActivity() {
                 if (isPaused) return
 
                 locationResult.lastLocation?.let { location ->
-                    // 🔥 Log for debugging
                     android.util.Log.d("WorkoutActivity",
                         "New location: ${location.latitude}, ${location.longitude}, Accuracy: ${location.accuracy}")
 
@@ -265,10 +265,9 @@ class WorkoutActivity : AppCompatActivity() {
         lastLocation?.let { oldLoc ->
             val distance = oldLoc.distanceTo(newLocation)
 
-            // 🔥 More lenient filtering for outdoor walking
             android.util.Log.d("WorkoutActivity", "Distance: $distance meters")
 
-            if (distance > 2 && distance < 200) { // Min 2m, Max 200m
+            if (distance > 2 && distance < 200) {
                 totalDistanceMeters += distance
                 android.util.Log.d("WorkoutActivity", "Total Distance: $totalDistanceMeters meters")
             } else {
@@ -290,15 +289,13 @@ class WorkoutActivity : AppCompatActivity() {
     private fun updateStatsUI() {
         val distanceKm = totalDistanceMeters / 1000.0
 
-        // 🔥 Always update UI even if distance is 0
         tvDistance.text = String.format("%.2f", distanceKm)
 
-        // Calculate pace (min/km)
-        if (distanceKm > 0.01 && seconds > 0) { // Only calculate if moved at least 10m
+        if (distanceKm > 0.01 && seconds > 0) {
             val totalMinutes = seconds / 60.0
             val avgPace = totalMinutes / distanceKm
 
-            if (avgPace.isFinite() && avgPace > 0 && avgPace < 60) { // Reasonable pace range
+            if (avgPace.isFinite() && avgPace > 0 && avgPace < 60) {
                 val paceMin = avgPace.toInt()
                 val paceSec = ((avgPace - paceMin) * 60).toInt()
                 tvPace.text = String.format("%d:%02d", paceMin, paceSec)
@@ -309,7 +306,6 @@ class WorkoutActivity : AppCompatActivity() {
             tvPace.text = "0:00"
         }
 
-        // Calculate calories
         val caloriesPerKm = when (workoutMode) {
             "RUNNING" -> 60
             "WALKING" -> 40
@@ -331,6 +327,12 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun stopWorkout() {
+        // ✅ CAPTURE MAP SCREENSHOT
+        val mapScreenshot = captureMapScreenshot()
+
+        // ✅ SAVE SCREENSHOT TO FILE
+        val mapImagePath = saveMapToFile(mapScreenshot)
+
         // Pass data to summary activity
         val intent = Intent(this, WorkoutSummaryActivity::class.java).apply {
             putExtra("WORKOUT_MODE", workoutMode)
@@ -338,10 +340,32 @@ class WorkoutActivity : AppCompatActivity() {
             putExtra("DISTANCE", tvDistance.text.toString())
             putExtra("CALORIES", tvCalories.text.toString())
             putExtra("PACE", tvPace.text.toString())
+            putExtra("MAP_IMAGE_PATH", mapImagePath) // ✅ PASS MAP IMAGE
         }
 
         startActivity(intent)
         finish()
+    }
+
+    // ✅ CAPTURE MAP AS BITMAP
+    private fun captureMapScreenshot(): Bitmap {
+        mapView.isDrawingCacheEnabled = true
+        mapView.buildDrawingCache()
+        val bitmap = Bitmap.createBitmap(mapView.drawingCache)
+        mapView.isDrawingCacheEnabled = false
+        return bitmap
+    }
+
+    // ✅ SAVE BITMAP TO FILE
+    private fun saveMapToFile(bitmap: Bitmap): String {
+        val filename = "workout_map_${System.currentTimeMillis()}.png"
+        val file = File(cacheDir, filename)
+
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
+        }
+
+        return file.absolutePath
     }
 
     override fun onResume() {

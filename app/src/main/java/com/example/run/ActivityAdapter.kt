@@ -43,9 +43,7 @@ class ActivityAdapter(private var activities: MutableList<ActivityItem>) :
         private val tvBestPace: TextView = itemView.findViewById(R.id.tvBestPace)
         private val tvSteps: TextView = itemView.findViewById(R.id.tvSteps)
 
-        private val btnViewDetails: CardView = itemView.findViewById(R.id.btnViewDetails)
         private val btnShare: CardView = itemView.findViewById(R.id.btnShare)
-        private val btnDelete: CardView = itemView.findViewById(R.id.btnDelete)
 
         fun bind(activity: ActivityItem) {
             // Set workout type and icon
@@ -94,17 +92,34 @@ class ActivityAdapter(private var activities: MutableList<ActivityItem>) :
             tvSteps.text = formatNumber(activity.steps)
 
             // Click listeners
-            btnViewDetails.setOnClickListener {
-                // TODO: Show workout details
-            }
 
             btnShare.setOnClickListener {
-                // TODO: Share workout
+
+                val context = itemView.context
+
+                val shareText = """
+🔥 My ${activity.workout_mode} Workout - CaloriX
+
+📅 Date: ${activity.date}
+⏱ Duration: ${activity.duration}
+📏 Distance: ${activity.distance}
+⚡ Pace: ${activity.pace}
+🔥 Calories: ${activity.calories}
+🏃 Steps: ${formatNumber(activity.steps)}
+
+Track your fitness with CaloriX 💪
+""".trimIndent()
+
+                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                }
+
+                context.startActivity(
+                    android.content.Intent.createChooser(intent, "Share via")
+                )
             }
 
-            btnDelete.setOnClickListener {
-                // TODO: Delete workout
-            }
         }
 
         private fun formatNumber(number: Int): String {

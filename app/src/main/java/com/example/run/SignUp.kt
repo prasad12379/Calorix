@@ -2,6 +2,7 @@ package com.example.run
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -22,6 +23,11 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var btnSignUp: CardView
     private lateinit var btnGoToSignIn: TextView
 
+    // ✅ LOADING VIEWS
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvSignUpText: TextView
+    private lateinit var ivArrow: ImageView
+
     private lateinit var apiInterface: ApiInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,13 +36,10 @@ class SignupActivity : AppCompatActivity() {
 
         initViews()
         initRetrofit()
-        setupDropdowns()   // ⭐ DROPDOWN FIX
+        setupDropdowns()
         setupListeners()
     }
 
-    // =========================
-    // 🔗 Bind XML Views
-    // =========================
     private fun initViews() {
         ipUsername = findViewById(R.id.ipUsername)
         ipEmail = findViewById(R.id.ipEmailR)
@@ -49,11 +52,13 @@ class SignupActivity : AppCompatActivity() {
         cbTerms = findViewById(R.id.cbTerms)
         btnSignUp = findViewById(R.id.btnSignUpR)
         btnGoToSignIn = findViewById(R.id.btnGoToSignIn)
+
+        // ✅ BIND LOADING VIEWS
+        progressBar = findViewById(R.id.progressBarSignup)
+        tvSignUpText = findViewById(R.id.tvSignUpText)
+        ivArrow = findViewById(R.id.ivArrowSignup)
     }
 
-    // =========================
-    // 🌐 Retrofit Setup
-    // =========================
     private fun initRetrofit() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://running-app-backend-p48y.onrender.com/")
@@ -63,36 +68,28 @@ class SignupActivity : AppCompatActivity() {
         apiInterface = retrofit.create(ApiInterface::class.java)
     }
 
-    // =========================
-    // ⭐ Dropdown Logic (FIXED)
-    // =========================
     private fun setupDropdowns() {
-
         // Gender Options
         val genderList = listOf("Male", "Female", "Other")
-
         val genderAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_dropdown_item_1line,
             genderList
         )
-
         ipGender.setAdapter(genderAdapter)
 
-        // Goal Options (UI Only)
+        // Goal Options
         val goalList = listOf(
             "Fat Loss",
             "Muscle Gain",
             "Maintain Fitness",
             "Improve Stamina"
         )
-
         val goalAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_dropdown_item_1line,
             goalList
         )
-
         ipGoal.setAdapter(goalAdapter)
 
         // Force dropdown open on click
@@ -100,11 +97,7 @@ class SignupActivity : AppCompatActivity() {
         ipGoal.setOnClickListener { ipGoal.showDropDown() }
     }
 
-    // =========================
-    // 🖱️ Click Listeners
-    // =========================
     private fun setupListeners() {
-
         btnSignUp.setOnClickListener {
             collectUserData()
         }
@@ -115,11 +108,7 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    // =========================
-    // 📥 Collect User Data
-    // =========================
     private fun collectUserData() {
-
         val name = ipUsername.text.toString().trim()
         val email = ipEmail.text.toString().trim()
         val password = ipPassword.text.toString().trim()
@@ -154,28 +143,28 @@ class SignupActivity : AppCompatActivity() {
         sendSignup(userData)
     }
 
-    // =========================
-    // 🚀 POST /signup API CALL
-    // =========================
     private fun sendSignup(userData: UserSignupRequest) {
+        // ✅ SHOW LOADING
+        showLoading(true)
 
         val call = apiInterface.signupUser(userData)
 
         call.enqueue(object : Callback<SignupResponse> {
-
             override fun onResponse(
                 call: Call<SignupResponse>,
                 response: Response<SignupResponse>
             ) {
-                if (response.isSuccessful && response.body() != null) {
+                // ✅ HIDE LOADING
+                showLoading(false)
 
+                if (response.isSuccessful && response.body() != null) {
                     Toast.makeText(
                         this@SignupActivity,
                         response.body()!!.message,
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
 
-                    // 👉 Redirect to SignIn
+                    // Redirect to SignIn
                     startActivity(Intent(this@SignupActivity, SignInActivity::class.java))
                     finish()
 
@@ -183,18 +172,36 @@ class SignupActivity : AppCompatActivity() {
                     Toast.makeText(
                         this@SignupActivity,
                         "Signup failed: ${response.code()}",
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
             }
 
             override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+                // ✅ HIDE LOADING
+                showLoading(false)
+
                 Toast.makeText(
                     this@SignupActivity,
                     "Network error: ${t.message}",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         })
+    }
+
+    // ✅ SHOW/HIDE LOADING
+    private fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            progressBar.visibility = View.VISIBLE
+            tvSignUpText.visibility = View.GONE
+            ivArrow.visibility = View.GONE
+            btnSignUp.isEnabled = false
+        } else {
+            progressBar.visibility = View.GONE
+            tvSignUpText.visibility = View.VISIBLE
+            ivArrow.visibility = View.VISIBLE
+            btnSignUp.isEnabled = true
+        }
     }
 }

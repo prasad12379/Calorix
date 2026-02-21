@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
@@ -55,10 +56,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         map.overlays.add(locationOverlay)
         locationOverlay.runOnFirstFix {
             requireActivity().runOnUiThread {
-
                 val myLoc = locationOverlay.myLocation
                 if (myLoc != null) {
-                    map.controller.setZoom(18.0)   // zoom level (17–19 best for running)
+                    map.controller.setZoom(18.0)
                     map.controller.animateTo(myLoc)
                 }
             }
@@ -66,12 +66,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         // ---------------- MAP SETUP END ----------------
 
-
-        // ---------------- YOUR ORIGINAL CODE ----------------
         val btnRunning = view.findViewById<CardView>(R.id.btnRunning)
         val btnWalking = view.findViewById<CardView>(R.id.btnWalking)
         val btnCycling = view.findViewById<CardView>(R.id.btnCycling)
         val btnStart = view.findViewById<View>(R.id.btnStart)
+
+        // Notification button
+        val cardNotification = view.findViewById<ImageView>(R.id.ivNotification)
+        cardNotification.setOnClickListener {
+            val intent = Intent(requireContext(), NotificationsActivity::class.java)
+            startActivity(intent)
+        }
 
         fun setGreen(card: CardView) {
             ViewCompat.setBackgroundTintList(
@@ -107,12 +112,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         btnWalking.setOnClickListener { selectMode("WALKING") }
         btnCycling.setOnClickListener { selectMode("CYCLING") }
 
+        // ✅ UPDATED: Launch CountdownActivity instead of WorkoutActivity
         btnStart.setOnClickListener {
-            val intent = Intent(requireContext(), WorkoutActivity::class.java)
+            val intent = Intent(requireContext(), CountdownActivity::class.java)
             intent.putExtra("MODE", selectedMode)
             startActivity(intent)
         }
-        // ---------------- END ORIGINAL CODE ----------------
     }
 
     // ✅ Fragment lifecycle for MapView
