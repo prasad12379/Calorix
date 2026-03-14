@@ -4,35 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
-
     <!-- Fragment Container -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav" />
-
-    <!-- PREMIUM Glass Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_above="@id/glowWrapper" />
+    <!-- NEON GLOW WRAPPER — replaces bare BottomNavigationView -->
+    <FrameLayout
+        android:id="@+id/glowWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="86dp"
         android:layout_alignParentBottom="true"
-
-        android:background="@drawable/glass_bottom_nav"
-        android:backgroundTint="@android:color/transparent"
-        android:elevation="0dp"
-
-        android:paddingTop="3dp"
-        android:paddingBottom="1dp"
-
-        app:itemIconSize="26dp"
-        app:itemRippleColor="@android:color/transparent"
-        app:labelVisibilityMode="labeled"
-
-        app:itemIconTint="@null"
-        app:itemTextColor="@color/bottom_nav_selector"
-
-        app:menu="@menu/bottom_nav_menu"/>
-
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/neon_glow_layer"
+        android:elevation="20dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp">
+        <!-- Your original BottomNavigationView — unchanged -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:background="@drawable/glass_bottom_nav"
+            app:itemIconSize="26dp"
+            app:itemRippleColor="@android:color/transparent"
+            app:labelVisibilityMode="unlabeled"
+            app:itemIconTint="@color/bottom_nav_selector"
+            app:menu="@menu/bottom_nav_menu" />
+    </FrameLayout>
 </RelativeLayout>

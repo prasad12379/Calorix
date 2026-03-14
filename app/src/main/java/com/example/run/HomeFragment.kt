@@ -71,6 +71,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val btnCycling = view.findViewById<CardView>(R.id.btnCycling)
         val btnStart = view.findViewById<View>(R.id.btnStart)
 
+        // ✅ WATER TRACKER BUTTON
+        val btnWaterTracker = view.findViewById<CardView>(R.id.btnWaterTracker)
+        btnWaterTracker.setOnClickListener {
+            val intent = Intent(requireContext(), water_tracker::class.java)
+            startActivity(intent)
+        }
+
         // Notification button
         val cardNotification = view.findViewById<ImageView>(R.id.ivNotification)
         cardNotification.setOnClickListener {
@@ -112,7 +119,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         btnWalking.setOnClickListener { selectMode("WALKING") }
         btnCycling.setOnClickListener { selectMode("CYCLING") }
 
-        // ✅ UPDATED: Launch CountdownActivity instead of WorkoutActivity
         btnStart.setOnClickListener {
             val intent = Intent(requireContext(), CountdownActivity::class.java)
             intent.putExtra("MODE", selectedMode)
