@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.remote.creation.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,5 +63,8 @@ dependencies {
 
     //lottie
     implementation("com.airbnb.android:lottie:6.1.0")
+
+    //for notification worker
+    implementation("androidx.work:work-runtime:2.9.0")
 
 }

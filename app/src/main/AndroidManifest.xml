@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!-- Permissions -->
+
+    <!-- Existing permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- ✅ Notification permission (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- ✅ Required for foreground service (WorkManager) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- ✅ Required for BootReceiver (restart reminders after reboot) -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- ✅ Keeps CPU awake while worker runs -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +28,27 @@
         android:theme="@style/Theme.Run"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!-- ✅ THIS IS THE KEY FIX — WorkManager's internal service needs foregroundServiceType -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"
+            tools:node="merge" />
+
+        <!-- ✅ BootReceiver — restarts reminders after phone reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Your existing activities — unchanged -->
+        <activity
+            android:name=".Water_take"
+            android:exported="false" />
         <activity
             android:name=".water_tracker"
             android:exported="false" />
@@ -25,13 +60,12 @@
             android:exported="false" />
         <activity
             android:name=".AboutActivity"
-            android:exported="false" /> <!-- ✅ SPLASH IS LAUNCHER -->
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -51,6 +85,7 @@
             android:name=".WorkoutSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

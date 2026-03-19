@@ -4,439 +4,458 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp">
 
-        <!-- HEADER -->
+        <!-- ═══════════════════════════════════════ -->
+        <!--               HEADER                    -->
+        <!-- ═══════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="30dp">
+            android:layout_marginBottom="28dp">
 
             <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@drawable/ic_arrow_back"
-                android:padding="8dp"
+                android:padding="9dp"
                 app:tint="#FFFFFF"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                android:background="@drawable/neon_icon_bg"
+                android:elevation="4dp"/>
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Water Tracker"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:letterSpacing="0.04"
+                android:fontFamily="sans-serif-condensed"/>
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@drawable/ic_water_drop"
-                app:tint="#64B5F6"/>
+                android:padding="9dp"
+                app:tint="#2ACFD9"
+                android:background="@drawable/neon_icon_bg_cyan"
+                android:elevation="4dp"/>
         </LinearLayout>
 
-        <!-- DAILY GOAL SECTION -->
+        <!-- ═══════════════════════════════════════ -->
+        <!--        DAILY GOAL CARD                  -->
+        <!-- ═══════════════════════════════════════ -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
-            app:cardCornerRadius="24dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="28dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="@android:color/transparent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/glass_card_background"
+                android:background="@drawable/neon_card_cyan"
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Title -->
+                <!-- Card Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginBottom="24dp">
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_target"
-                        app:tint="#64B5F6"
-                        android:layout_marginEnd="10dp"/>
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:gravity="center"
+                        android:background="@drawable/neon_dot_cyan">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_target"
+                            app:tint="#2ACFD9"/>
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Daily Water Goal"
-                        android:textSize="18sp"
+                        android:layout_weight="1"
+                        android:text="Daily Goal"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF"
+                        android:layout_marginStart="12dp"
+                        android:letterSpacing="0.05"/>
+
+                    <!-- Live badge -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/badge_cyan"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ACTIVE"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#2ACFD9"
+                            android:letterSpacing="0.1"/>
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Animated Water Slider -->
+                <!-- Big Water Amount -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
 
-                    <!-- Water Amount Display -->
+                    <TextView
+                        android:id="@+id/tvWaterGoal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2.5"
+                        android:textSize="72sp"
+                        android:textStyle="bold"
+                        android:textColor="#2ACFD9"
+                        android:fontFamily="sans-serif-condensed"
+                        android:elevation="2dp"/>
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_marginBottom="20dp">
+                        android:orientation="vertical"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="24dp">
 
                         <TextView
-                            android:id="@+id/tvWaterGoal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2.5"
-                            android:textSize="56sp"
+                            android:text="L"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#64B5F6"
-                            android:fontFamily="sans-serif-condensed"/>
+                            android:textColor="#80FFFFFF"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=" L"
-                            android:textSize="32sp"
-                            android:textColor="#B3FFFFFF"
-                            android:layout_marginTop="8dp"/>
+                            android:text="per day"
+                            android:textSize="11sp"
+                            android:textColor="#50FFFFFF"/>
                     </LinearLayout>
+                </LinearLayout>
 
-                    <!-- Slider Track with Water Drops -->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_marginBottom="10dp">
+                <!-- Water drop visual indicator row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
 
-                        <!-- Water Drop Icons -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:gravity="center">
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#302ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#502ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#702ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="26dp" android:layout_height="26dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#CC2ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#702ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#502ACFD9"
+                        android:layout_marginEnd="6dp"/>
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp"
+                        android:src="@drawable/ic_water_drop" app:tint="#302ACFD9"/>
+                </LinearLayout>
 
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_water_drop"
-                                app:tint="#4064B5F6"
-                                android:layout_marginEnd="15dp"/>
+                <!-- Slider -->
+                <SeekBar
+                    android:id="@+id/seekBarWaterGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:max="80"
+                    android:min="5"
+                    android:progress="25"
+                    android:progressTint="#2ACFD9"
+                    android:thumbTint="#2ACFD9"
+                    android:progressBackgroundTint="#25FFFFFF"/>
 
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_water_drop"
-                                app:tint="#6064B5F6"
-                                android:layout_marginEnd="15dp"/>
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_water_drop"
-                                app:tint="#8064B5F6"/>
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_water_drop"
-                                app:tint="#6064B5F6"
-                                android:layout_marginStart="15dp"/>
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_water_drop"
-                                app:tint="#4064B5F6"
-                                android:layout_marginStart="15dp"/>
-                        </LinearLayout>
-
-                        <!-- Slider -->
-                        <SeekBar
-                            android:id="@+id/seekBarWaterGoal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:max="80"
-                            android:min="5"
-                            android:progress="25"
-                            android:progressTint="#64B5F6"
-                            android:thumbTint="#64B5F6"
-                            android:progressBackgroundTint="#30FFFFFF"/>
-                    </FrameLayout>
-
-                    <!-- Min/Max Labels -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                <!-- Min/Max -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="0.5 L"
-                            android:textSize="12sp"
-                            android:textColor="#80FFFFFF"
-                            android:gravity="start"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="8.0 L"
-                            android:textSize="12sp"
-                            android:textColor="#80FFFFFF"
-                            android:gravity="end"/>
-                    </LinearLayout>
-
+                        android:layout_weight="1"
+                        android:text="0.5 L"
+                        android:textSize="11sp"
+                        android:textColor="#50FFFFFF"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="8.0 L"
+                        android:textSize="11sp"
+                        android:textColor="#50FFFFFF"
+                        android:gravity="end"/>
                 </LinearLayout>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- REMINDER TIME SECTION -->
+        <!-- ═══════════════════════════════════════ -->
+        <!--        REMINDER INTERVAL CARD           -->
+        <!-- ═══════════════════════════════════════ -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
-            app:cardCornerRadius="24dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="28dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="@android:color/transparent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/glass_card_background"
+                android:background="@drawable/neon_card_amber"
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Title -->
+                <!-- Card Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginBottom="24dp">
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_time"
-                        app:tint="#FFC107"
-                        android:layout_marginEnd="10dp"/>
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:gravity="center"
+                        android:background="@drawable/neon_dot_amber">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_time"
+                            app:tint="#FFC107"/>
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Reminder Interval"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF"
+                        android:layout_marginStart="12dp"
+                        android:letterSpacing="0.05"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/badge_amber"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ON"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFC107"
+                            android:letterSpacing="0.1"/>
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Animated Clock Display -->
+                <!-- Clock Face — centered, clean -->
                 <FrameLayout
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
                     android:layout_gravity="center"
                     android:layout_marginBottom="20dp">
 
-                    <!-- Clock Background Circle -->
                     <androidx.cardview.widget.CardView
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
                         android:layout_gravity="center"
-                        app:cardCornerRadius="100dp"
-                        app:cardElevation="8dp"
-                        android:backgroundTint="#15FFFFFF">
+                        app:cardCornerRadius="90dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#12FFC107">
 
-                        <!-- Clock Face -->
                         <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <!-- Center Dot -->
-                            <View
-                                android:layout_width="12dp"
-                                android:layout_height="12dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/circle_shape"
-                                android:backgroundTint="#FFC107"/>
-
-                            <!-- Hour Markers -->
+                            <!-- Tick markers vertical -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:orientation="vertical"
                                 android:gravity="center">
-
-                                <!-- 12 o'clock -->
-                                <View
-                                    android:layout_width="3dp"
-                                    android:layout_height="10dp"
-                                    android:background="#80FFFFFF"
-                                    android:layout_marginBottom="75dp"/>
-
-                                <Space
-                                    android:layout_width="1dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"/>
-
-                                <!-- 6 o'clock -->
-                                <View
-                                    android:layout_width="3dp"
-                                    android:layout_height="10dp"
-                                    android:background="#80FFFFFF"
-                                    android:layout_marginTop="75dp"/>
+                                <View android:layout_width="2dp" android:layout_height="8dp"
+                                    android:background="#60FFC107" android:layout_marginBottom="68dp"/>
+                                <Space android:layout_width="1dp" android:layout_height="0dp" android:layout_weight="1"/>
+                                <View android:layout_width="2dp" android:layout_height="8dp"
+                                    android:background="#60FFC107" android:layout_marginTop="68dp"/>
                             </LinearLayout>
 
-                            <!-- 3 and 9 o'clock markers (horizontal) -->
+                            <!-- Tick markers horizontal -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:orientation="horizontal"
                                 android:gravity="center">
-
-                                <!-- 9 o'clock -->
-                                <View
-                                    android:layout_width="10dp"
-                                    android:layout_height="3dp"
-                                    android:background="#80FFFFFF"
-                                    android:layout_marginEnd="75dp"/>
-
-                                <Space
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1"/>
-
-                                <!-- 3 o'clock -->
-                                <View
-                                    android:layout_width="10dp"
-                                    android:layout_height="3dp"
-                                    android:background="#80FFFFFF"
-                                    android:layout_marginStart="75dp"/>
+                                <View android:layout_width="8dp" android:layout_height="2dp"
+                                    android:background="#60FFC107" android:layout_marginEnd="68dp"/>
+                                <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"/>
+                                <View android:layout_width="8dp" android:layout_height="2dp"
+                                    android:background="#60FFC107" android:layout_marginStart="68dp"/>
                             </LinearLayout>
 
-                            <!-- Hour Hand (Animated) -->
+                            <!-- Center dot -->
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/circle_shape"
+                                android:backgroundTint="#FFC107"
+                                android:elevation="4dp"/>
+
+                            <!-- Clock hand -->
                             <ImageView
                                 android:id="@+id/ivClockHand"
-                                android:layout_width="80dp"
-                                android:layout_height="4dp"
+                                android:layout_width="72dp"
+                                android:layout_height="3dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/clock_hand"
                                 android:rotation="0"
-                                app:tint="#FFC107"/>
+                                app:tint="#FFC107"
+                                android:elevation="3dp"/>
 
-                            <!-- Time Display -->
+                            <!-- Time text -->
                             <TextView
                                 android:id="@+id/tvReminderTime"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:layout_marginTop="60dp"
+                                android:layout_marginTop="52dp"
                                 android:text="2 hrs"
-                                android:textSize="20sp"
+                                android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="#FFC107"/>
-
                         </FrameLayout>
                     </androidx.cardview.widget.CardView>
 
                 </FrameLayout>
 
-                <!-- Clock Instruction -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
                     android:text="Tap and drag to set reminder interval"
-                    android:textSize="12sp"
-                    android:textColor="#80FFFFFF"
+                    android:textSize="11sp"
+                    android:textColor="#50FFFFFF"
                     android:gravity="center"
-                    android:layout_marginBottom="15dp"/>
+                    android:layout_marginBottom="20dp"/>
 
-                <!-- Quick Preset Buttons -->
+                <!-- Quick preset buttons — pill style matching nav bar -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:orientation="horizontal">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/btn1Hour"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="20dp"
+                        app:cardCornerRadius="22dp"
                         app:cardElevation="0dp"
-                        android:backgroundTint="#30FFFFFF"
+                        app:cardBackgroundColor="#20FFC107"
                         android:foreground="?android:attr/selectableItemBackground">
-
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="1 hr"
                             android:textSize="13sp"
-                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:textColor="#CCFFC107"
                             android:gravity="center"/>
                     </androidx.cardview.widget.CardView>
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/btn2Hours"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="20dp"
+                        app:cardCornerRadius="22dp"
                         app:cardElevation="0dp"
-                        android:backgroundTint="#30FFFFFF"
+                        app:cardBackgroundColor="#40FFC107"
                         android:foreground="?android:attr/selectableItemBackground">
-
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="2 hrs"
                             android:textSize="13sp"
-                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFC107"
                             android:gravity="center"/>
                     </androidx.cardview.widget.CardView>
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/btn3Hours"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        app:cardCornerRadius="20dp"
+                        app:cardCornerRadius="22dp"
                         app:cardElevation="0dp"
-                        android:backgroundTint="#30FFFFFF"
+                        app:cardBackgroundColor="#20FFC107"
                         android:foreground="?android:attr/selectableItemBackground">
-
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="3 hrs"
                             android:textSize="13sp"
-                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:textColor="#CCFFC107"
                             android:gravity="center"/>
                     </androidx.cardview.widget.CardView>
 
@@ -445,51 +464,71 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- TODAY'S INTAKE SECTION -->
-        <!-- Drink Water Button -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/btnDrinkWater"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            app:cardCornerRadius="30dp"
-            app:cardElevation="8dp"
-            android:backgroundTint="#4CAF50"
-            android:foreground="?android:attr/selectableItemBackground">
+        <!-- ═══════════════════════════════════════ -->
+        <!--        ADD WATER BUTTON                 -->
+        <!--   Matches bottom nav pill aesthetic     -->
+        <!-- ═══════════════════════════════════════ -->
 
-            <LinearLayout
+        <!-- Outer glow wrapper — same technique as bottom nav -->
+        <FrameLayout
+            android:id="@+id/glowWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:background="@drawable/neon_button_glow"
+            android:elevation="12dp"
+            android:padding="6dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnDrinkWater"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center">
+                app:cardCornerRadius="30dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1A1A1A"
+                android:foreground="?android:attr/selectableItemBackground">
 
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_water_drop"
-                    app:tint="#FFFFFF"
-                    android:layout_marginEnd="12dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ADD WATER INTAKE"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:letterSpacing="0.1"/>
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_water_drop"
+                        app:tint="#2ACFD9"
+                        android:layout_marginEnd="12dp"/>
 
-                <TextView
-                    android:id="@+id/tvQuickAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" (250ml)"
-                    android:textSize="14sp"
-                    android:textColor="#E0FFFFFF"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Set Remainder"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:letterSpacing="0.08"
+                        android:fontFamily="sans-serif-condensed"/>
 
+                    <TextView
+                        android:id="@+id/tvQuickAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="250 ml"
+                        android:textSize="13sp"
+                        android:textColor="#992ACFD9"
+                        android:background="@drawable/badge_cyan_small"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"/>
+                </LinearLayout>
 
-
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
 
     </LinearLayout>
 </ScrollView>
