@@ -70,11 +70,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val btnWalking = view.findViewById<CardView>(R.id.btnWalking)
         val btnCycling = view.findViewById<CardView>(R.id.btnCycling)
         val btnStart = view.findViewById<View>(R.id.btnStart)
+        val stress_btn=view.findViewById<CardView>(R.id.cardStressGame)
 
         // ✅ WATER TRACKER BUTTON
         val btnWaterTracker = view.findViewById<CardView>(R.id.btnWaterTracker)
         btnWaterTracker.setOnClickListener {
             val intent = Intent(requireContext(), water_tracker::class.java)
+            startActivity(intent)
+        }
+
+        stress_btn.setOnClickListener {
+            val intent = Intent(requireContext(), Stress_Game::class.java)
             startActivity(intent)
         }
 

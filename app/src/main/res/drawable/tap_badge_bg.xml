@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  
-</selector>
+<!-- res/drawable/tap_badge_bg.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#446C63FF"/>
+    <stroke
+        android:width="1dp"
+        android:color="#886C63FF"/>
+    <corners android:radius="50dp"/>
+</shape>

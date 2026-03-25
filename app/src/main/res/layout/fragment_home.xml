@@ -172,7 +172,6 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/glass_card_background"
-
                     android:padding="16dp">
 
                     <ImageView
@@ -208,8 +207,7 @@
                 android:layout_weight="1"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                >
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -217,7 +215,6 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/glass_card_background"
-
                     android:padding="16dp">
 
                     <ImageView
@@ -265,7 +262,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
 
-
                 <!-- Center Map Button -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnCenterMap"
@@ -301,8 +297,7 @@
                 android:layout_height="80dp"
                 android:layout_marginEnd="12dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                >
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -313,8 +308,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_running"
-                        />
+                        android:src="@drawable/ic_running"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -386,6 +380,114 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             STRESS CHECK CARD  — tap to open StressGameActivity
+             Animated: pulsing ring + shimmer + bounce-in on scroll
+             ═══════════════════════════════════════════════════════════ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardStressGame"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="12dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <!-- Gradient background layer -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/stress_card_gradient">
+
+                <!-- Pulsing glow ring (animates via ObjectAnimator in code) -->
+                <View
+                    android:id="@+id/viewStressGlow"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="18dp"
+                    android:background="@drawable/stress_glow_ring"
+                    android:alpha="0.6"/>
+
+                <!-- Brain emoji container -->
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="26dp">
+
+                    <!-- Solid circle background -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/stress_icon_bg"/>
+
+                    <TextView
+                        android:id="@+id/tvStressBrain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="🧠"
+                        android:textSize="28sp"/>
+                </FrameLayout>
+
+                <!-- Text content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="108dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Stress Check"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="sans-serif-medium"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quick 10-round cognitive test"
+                        android:textSize="12sp"
+                        android:textColor="#B3FFFFFF"
+                        android:layout_marginTop="3dp"/>
+
+                    <!-- Animated "TAP" pill badge -->
+                    <TextView
+                        android:id="@+id/tvTapBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="  TAP TO START  "
+                        android:textSize="9sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.15"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/tap_badge_bg"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"/>
+                </LinearLayout>
+
+                <!-- Arrow icon -->
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_arrow_forward"
+                    android:alpha="0.7"
+                    app:tint="#FFFFFF"/>
+
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+        <!-- ═══════════════════════════════════════════════════════════ -->
 
         <!-- Start Button -->
         <androidx.cardview.widget.CardView
