@@ -294,6 +294,7 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp">
                         <TextView
+                            android:id="@+id/tvReminderBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="ON"
@@ -304,7 +305,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Clock Face — centered, clean -->
+                <!-- Clock Face -->
                 <FrameLayout
                     android:layout_width="180dp"
                     android:layout_height="180dp"
@@ -323,7 +324,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <!-- Tick markers vertical -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -336,7 +336,6 @@
                                     android:background="#60FFC107" android:layout_marginTop="68dp"/>
                             </LinearLayout>
 
-                            <!-- Tick markers horizontal -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -349,7 +348,6 @@
                                     android:background="#60FFC107" android:layout_marginStart="68dp"/>
                             </LinearLayout>
 
-                            <!-- Center dot -->
                             <View
                                 android:layout_width="10dp"
                                 android:layout_height="10dp"
@@ -358,7 +356,6 @@
                                 android:backgroundTint="#FFC107"
                                 android:elevation="4dp"/>
 
-                            <!-- Clock hand -->
                             <ImageView
                                 android:id="@+id/ivClockHand"
                                 android:layout_width="72dp"
@@ -369,14 +366,13 @@
                                 app:tint="#FFC107"
                                 android:elevation="3dp"/>
 
-                            <!-- Time text -->
                             <TextView
                                 android:id="@+id/tvReminderTime"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginTop="52dp"
-                                android:text="2 hrs"
+                                android:text="1 hr"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="#FFC107"/>
@@ -388,13 +384,13 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tap and drag to set reminder interval"
+                    android:text="Tap a preset below to set reminder interval"
                     android:textSize="11sp"
                     android:textColor="#50FFFFFF"
                     android:gravity="center"
                     android:layout_marginBottom="20dp"/>
 
-                <!-- Quick preset buttons — pill style matching nav bar -->
+                <!-- Quick preset buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -465,18 +461,105 @@
         </androidx.cardview.widget.CardView>
 
         <!-- ═══════════════════════════════════════ -->
-        <!--        ADD WATER BUTTON                 -->
-        <!--   Matches bottom nav pill aesthetic     -->
+        <!--   STATUS CARD  (shows active state)     -->
         <!-- ═══════════════════════════════════════ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardReminderStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
-        <!-- Outer glow wrapper — same technique as bottom nav -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/neon_card_green"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="18dp">
+
+                <!-- Pulsing dot -->
+                <FrameLayout
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="14dp">
+
+                    <!-- Outer pulse ring -->
+                    <View
+                        android:id="@+id/viewPulseRing"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/pulse_ring_green"
+                        android:alpha="0.4"/>
+
+                    <!-- Inner solid dot -->
+                    <View
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_shape"
+                        android:backgroundTint="#4CAF50"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reminder Active"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:id="@+id/tvStatusDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Every 1 hr · 2.5 L goal"
+                        android:textSize="12sp"
+                        android:textColor="#80FFFFFF"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <!-- Small green badge -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:background="@drawable/badge_green"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ON"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#4CAF50"
+                        android:letterSpacing="0.1"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!--        SET REMINDER BUTTON (cyan)       -->
+        <!-- ═══════════════════════════════════════ -->
         <FrameLayout
-            android:id="@+id/glowWrapper"
             android:layout_width="match_parent"
             android:layout_height="68dp"
             android:background="@drawable/neon_button_glow"
             android:elevation="12dp"
-            android:padding="6dp">
+            android:padding="6dp"
+            android:layout_marginBottom="14dp">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnDrinkWater"
@@ -506,7 +589,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Set Remainder"
+                        android:text="Set Reminder"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
@@ -525,6 +608,88 @@
                         android:paddingEnd="10dp"
                         android:paddingTop="4dp"
                         android:paddingBottom="4dp"/>
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!--    STOP REMINDER BUTTON  (red/coral)    -->
+        <!-- ═══════════════════════════════════════ -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:background="@drawable/neon_button_glow_red"
+            android:elevation="12dp"
+            android:padding="6dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnStopReminder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1A1A1A"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp">
+
+                    <!-- Stop icon -->
+                    <FrameLayout
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginEnd="12dp">
+                        <View
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/circle_shape"
+                            android:backgroundTint="#FF5252"/>
+                        <View
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:background="@drawable/circle_shape"
+                            android:backgroundTint="#1AFF5252"/>
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Stop Reminder"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:letterSpacing="0.08"
+                        android:fontFamily="sans-serif-condensed"/>
+
+                    <!-- Status badge — changes text in code -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/badge_red_small"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp">
+                        <TextView
+                            android:id="@+id/tvStopBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CANCEL"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#FF5252"
+                            android:letterSpacing="0.1"/>
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>

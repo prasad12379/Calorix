@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.FrameLayout  // ← new
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.run.HomeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat

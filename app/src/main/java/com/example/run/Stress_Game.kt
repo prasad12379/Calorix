@@ -1,5 +1,6 @@
 package com.example.run
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.TextAlign
@@ -53,7 +55,6 @@ fun StressGameTheme(content: @Composable () -> Unit) {
 enum class GameState { INTRO, COUNTDOWN, PLAYING, RESULT }
 enum class StressLevel { LOW, MEDIUM, HIGH, VERY_HIGH }
 
-// FIX: Use a plain data class (not mutable state) for particles — never mutated
 data class Particle(
     val id: Int,
     val x: Float,
@@ -140,7 +141,6 @@ fun StressGameScreen(onBack: () -> Unit) {
 // ── Background Particles ──────────────────────────────────────────────────────
 @Composable
 fun BackgroundParticles() {
-    // FIX: Plain List — not MutableStateList — since we never mutate it
     val particles = remember {
         List(20) {
             Particle(
@@ -255,10 +255,10 @@ fun IntroScreen(onStart: () -> Unit, onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text      = "A quick cognitive game to\nmeasure your stress level",
-            fontSize  = 16.sp,
-            color     = Color.White.copy(alpha = 0.6f),
-            textAlign = TextAlign.Center,
+            text       = "A quick cognitive game to\nmeasure your stress level",
+            fontSize   = 16.sp,
+            color      = Color.White.copy(alpha = 0.6f),
+            textAlign  = TextAlign.Center,
             lineHeight = 24.sp
         )
 
@@ -374,13 +374,12 @@ fun CountdownScreen(countdown: Int) {
 // ── Gameplay Screen ───────────────────────────────────────────────────────────
 @Composable
 fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
-    val haptic  = LocalHapticFeedback.current
-    val scope   = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    val scope  = rememberCoroutineScope()
 
-    // FIX: Use a regular mutableStateOf list to avoid observer overhead
     var results by remember { mutableStateOf(listOf<RoundResult>()) }
 
-    val totalRounds = 10
+    val totalRounds    = 10
     var currentRound   by remember { mutableIntStateOf(0) }
     var roundStartTime by remember { mutableLongStateOf(0L) }
     var showTarget     by remember { mutableStateOf(false) }
@@ -400,12 +399,9 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
     var targetColor  by remember { mutableStateOf(Color.White) }
     var options      by remember { mutableStateOf(listOf<Pair<String, Color>>()) }
     var correctIndex by remember { mutableIntStateOf(0) }
-
-    var showBurst  by remember { mutableStateOf(false) }
-    var burstColor by remember { mutableStateOf(Color.Green) }
-
-    // FIX: Track the active round job so we can cancel it on rapid taps
-    var roundJob by remember { mutableStateOf<Job?>(null) }
+    var showBurst    by remember { mutableStateOf(false) }
+    var burstColor   by remember { mutableStateOf(Color.Green) }
+    var roundJob     by remember { mutableStateOf<Job?>(null) }
 
     val progressAnim by animateFloatAsState(
         targetValue   = currentRound.toFloat() / totalRounds,
@@ -434,17 +430,16 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
         isWaiting  = true
         showTarget = false
 
-        val reactionMs  = System.currentTimeMillis() - roundStartTime
-        val correct     = index == correctIndex
-        val newResults  = results + RoundResult(reactionMs, correct)
-        results         = newResults
+        val reactionMs = System.currentTimeMillis() - roundStartTime
+        val correct    = index == correctIndex
+        val newResults = results + RoundResult(reactionMs, correct)
+        results        = newResults
 
         burstColor = if (correct) Color(0xFF4CAF50) else Color(0xFFE53935)
         showBurst  = true
 
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 
-        // FIX: Cancel any existing round job before launching a new one
         roundJob?.cancel()
         roundJob = scope.launch {
             delay(800)
@@ -465,20 +460,15 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
         currentRound = 1
     }
 
-    // FIX: Cancel round job when leaving composition
     DisposableEffect(Unit) {
         onDispose { roundJob?.cancel() }
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (showBurst) {
-            BurstEffect(color = burstColor)
-        }
+        if (showBurst) BurstEffect(color = burstColor)
 
         Column(
-            modifier            = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+            modifier            = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(48.dp))
@@ -513,10 +503,10 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
             Spacer(modifier = Modifier.height(60.dp))
 
             Text(
-                text      = "Tap the color that matches\nthe TEXT COLOR (not the word)",
-                color     = Color.White.copy(alpha = 0.5f),
-                fontSize  = 13.sp,
-                textAlign = TextAlign.Center,
+                text       = "Tap the color that matches\nthe TEXT COLOR (not the word)",
+                color      = Color.White.copy(alpha = 0.5f),
+                fontSize   = 13.sp,
+                textAlign  = TextAlign.Center,
                 lineHeight = 20.sp
             )
 
@@ -530,15 +520,8 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(160.dp)
-                        .background(
-                            Color.White.copy(alpha = 0.05f),
-                            RoundedCornerShape(20.dp)
-                        )
-                        .border(
-                            2.dp,
-                            targetColor.copy(alpha = 0.5f),
-                            RoundedCornerShape(20.dp)
-                        ),
+                        .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
+                        .border(2.dp, targetColor.copy(alpha = 0.5f), RoundedCornerShape(20.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -556,7 +539,7 @@ fun GamePlayScreen(onComplete: (List<RoundResult>) -> Unit) {
                 options.chunked(2).forEachIndexed { rowIdx, rowOptions ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier              = Modifier.fillMaxWidth()
                     ) {
                         rowOptions.forEachIndexed { colIdx, option ->
                             val globalIdx = rowIdx * 2 + colIdx
@@ -610,11 +593,7 @@ fun ColorOptionButton(
         contentAlignment = Alignment.Center
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(14.dp)
-                    .background(color, CircleShape)
-            )
+            Box(modifier = Modifier.size(14.dp).background(color, CircleShape))
             Spacer(modifier = Modifier.width(8.dp))
             Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         }
@@ -624,23 +603,16 @@ fun ColorOptionButton(
 // ── Particle Burst Effect ─────────────────────────────────────────────────────
 @Composable
 fun BurstEffect(color: Color) {
-    // FIX: Use remember with color as key so it resets cleanly per burst
     val particles = remember(color) {
         List(20) {
             val angle = (it / 20f) * 2f * PI.toFloat()
             val speed = Random.nextFloat() * 8f + 4f
-            Triple(
-                cos(angle) * speed,
-                sin(angle) * speed,
-                Random.nextFloat() * 6f + 3f
-            )
+            Triple(cos(angle) * speed, sin(angle) * speed, Random.nextFloat() * 6f + 3f)
         }
     }
 
     var progress by remember(color) { mutableFloatStateOf(0f) }
 
-    // FIX: Drive animation via LaunchedEffect rather than animateFloatAsState
-    // so it doesn't linger or stack when showBurst toggles rapidly
     LaunchedEffect(color) {
         val startTime = System.currentTimeMillis()
         val duration  = 800L
@@ -677,18 +649,13 @@ fun ResultScreen(
     onPlayAgain: () -> Unit,
     onBack: () -> Unit
 ) {
-    data class LevelInfo(
-        val color: Color,
-        val emoji: String,
-        val title: String,
-        val message: String
-    )
+    data class LevelInfo(val color: Color, val emoji: String, val title: String, val message: String)
 
     val info = when (stressLevel) {
-        StressLevel.LOW       -> LevelInfo(Color(0xFF4CAF50), "😌", "Low Stress",      "You're calm and focused. Keep it up!")
-        StressLevel.MEDIUM    -> LevelInfo(Color(0xFFFFC107), "😐", "Moderate Stress", "Mild stress detected. Take a short break.")
-        StressLevel.HIGH      -> LevelInfo(Color(0xFFFF9800), "😰", "High Stress",     "You seem stressed. Try deep breathing.")
-        StressLevel.VERY_HIGH -> LevelInfo(Color(0xFFE53935), "😫", "Very High Stress","High stress! Rest and hydrate now.")
+        StressLevel.LOW       -> LevelInfo(Color(0xFF4CAF50), "😌", "Low Stress",       "You're calm and focused. Keep it up!")
+        StressLevel.MEDIUM    -> LevelInfo(Color(0xFFFFC107), "😐", "Moderate Stress",  "Mild stress detected. Take a short break.")
+        StressLevel.HIGH      -> LevelInfo(Color(0xFFFF9800), "😰", "High Stress",      "You seem stressed. Try deep breathing.")
+        StressLevel.VERY_HIGH -> LevelInfo(Color(0xFFE53935), "😫", "Very High Stress", "High stress! Rest and hydrate now.")
     }
 
     val animScore by animateIntAsState(
@@ -704,6 +671,21 @@ fun ResultScreen(
 
     val accuracy = if (results.isNotEmpty()) results.count { it.correct }.toFloat() / results.size * 100f else 0f
     val avgMs    = if (results.isNotEmpty()) results.map { it.reactionMs }.average().toInt() else 0
+
+    // ✅ For launching Bhagwat_Gita activity
+    val context = LocalContext.current
+
+    // ✅ Gita card glow animation
+    val gitaPulse = rememberInfiniteTransition(label = "gitaPulse")
+    val gitaGlow by gitaPulse.animateFloat(
+        initialValue  = 0.3f,
+        targetValue   = 0.9f,
+        animationSpec = infiniteRepeatable(
+            tween(1200, easing = FastOutSlowInEasing),
+            RepeatMode.Reverse
+        ),
+        label = "gitaGlow"
+    )
 
     Column(
         modifier            = Modifier
@@ -723,9 +705,9 @@ fun ResultScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // ── Animated stress ring ──────────────────────────────────────────────
         Box(contentAlignment = Alignment.Center) {
             Canvas(modifier = Modifier.size(200.dp)) {
-                // Background ring
                 drawArc(
                     color      = Color.White.copy(alpha = 0.1f),
                     startAngle = -90f,
@@ -733,7 +715,6 @@ fun ResultScreen(
                     useCenter  = false,
                     style      = Stroke(width = 16.dp.toPx(), cap = StrokeCap.Round)
                 )
-                // Score ring
                 drawArc(
                     brush      = Brush.sweepGradient(
                         listOf(Color(0xFF4CAF50), Color(0xFFFFC107), Color(0xFFE53935))
@@ -744,26 +725,17 @@ fun ResultScreen(
                     style      = Stroke(width = 16.dp.toPx(), cap = StrokeCap.Round)
                 )
             }
-
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(info.emoji, fontSize = 36.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "$animScore",
-                    fontSize   = 36.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color      = info.color
-                )
-                Text(
-                    "/ 100",
-                    fontSize = 14.sp,
-                    color    = Color.White.copy(alpha = 0.4f)
-                )
+                Text("$animScore", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = info.color)
+                Text("/ 100", fontSize = 14.sp, color = Color.White.copy(alpha = 0.4f))
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // ── Stress level badge ────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .background(info.color.copy(alpha = 0.15f), RoundedCornerShape(50.dp))
@@ -775,26 +747,177 @@ fun ResultScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            info.message,
-            color     = Color.White.copy(alpha = 0.7f),
-            fontSize  = 15.sp,
-            textAlign = TextAlign.Center
-        )
+        Text(info.message, color = Color.White.copy(alpha = 0.7f), fontSize = 15.sp, textAlign = TextAlign.Center)
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // ── Stats ─────────────────────────────────────────────────────────────
         Row(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            StatCard(modifier = Modifier.weight(1f), label = "Accuracy", value = "${accuracy.toInt()}%",  color = Color(0xFF00BCD4))
+            StatCard(modifier = Modifier.weight(1f), label = "Accuracy",  value = "${accuracy.toInt()}%", color = Color(0xFF00BCD4))
             StatCard(modifier = Modifier.weight(1f), label = "Avg Speed", value = "${avgMs}ms",           color = Color(0xFF6C63FF))
             StatCard(modifier = Modifier.weight(1f), label = "Rounds",    value = "${results.size}",      color = Color(0xFF4CAF50))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // ── ✅ Bhagavad Gita Recommendation Card (shown for all stress levels) ─
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0xFFFF9800).copy(alpha = 0.12f),
+                            Color(0xFFE91E63).copy(alpha = 0.12f)
+                        )
+                    ),
+                    RoundedCornerShape(20.dp)
+                )
+                .border(
+                    width = 1.5.dp,
+                    brush = Brush.linearGradient(
+                        listOf(
+                            Color(0xFFFF9800).copy(alpha = gitaGlow),
+                            Color(0xFFE91E63).copy(alpha = gitaGlow)
+                        )
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                // Header row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier          = Modifier.fillMaxWidth()
+                ) {
+                    // Om icon with glow
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .background(
+                                Brush.radialGradient(
+                                    listOf(
+                                        Color(0xFFFF9800).copy(alpha = gitaGlow * 0.4f),
+                                        Color.Transparent
+                                    )
+                                ),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🕉️", fontSize = 28.sp)
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column {
+                        // ✅ Show different message based on stress level
+                        Text(
+                            text = when (stressLevel) {
+                                StressLevel.LOW       -> "Stay Peaceful 🌿"
+                                StressLevel.MEDIUM    -> "Find Your Calm 🌊"
+                                StressLevel.HIGH      -> "Seek Inner Peace 🙏"
+                                StressLevel.VERY_HIGH -> "You Need Peace Now 💫"
+                            },
+                            color      = Color(0xFFFF9800),
+                            fontSize   = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = when (stressLevel) {
+                                StressLevel.LOW       -> "Read Bhagavad Gita shlokas\nto maintain your inner peace"
+                                StressLevel.MEDIUM    -> "Bhagavad Gita shlokas can\nhelp restore your calm"
+                                StressLevel.HIGH      -> "Read sacred shlokas for\nstress relief and clarity"
+                                StressLevel.VERY_HIGH -> "Urgent! Read Gita shlokas\nfor immediate relief"
+                            },
+                            color      = Color.White.copy(alpha = 0.65f),
+                            fontSize   = 13.sp,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    Color.Transparent,
+                                    Color(0xFFFF9800).copy(alpha = 0.4f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Random shloka preview teaser
+                Text(
+                    text      = "\" कर्मण्येवाधिकारस्ते मा फलेषु कदाचन \"",
+                    color     = Color(0xFFFF9800).copy(alpha = 0.7f),
+                    fontSize  = 12.sp,
+                    textAlign = TextAlign.Center,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                )
+                Text(
+                    text      = "Chapter 2, Verse 47",
+                    color     = Color.White.copy(alpha = 0.3f),
+                    fontSize  = 10.sp,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // ✅ Open Bhagwat_Gita button
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color(0xFFFF9800), Color(0xFFE91E63))
+                            ),
+                            RoundedCornerShape(25.dp)
+                        )
+                        .clickable {
+                            context.startActivity(
+                                Intent(context, bhagwat_gita::class.java)
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment      = Alignment.CenterVertically,
+                        horizontalArrangement  = Arrangement.Center
+                    ) {
+                        Text("🕉️", fontSize = 18.sp)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Open Bhagavad Gita",
+                            color      = Color.White,
+                            fontSize   = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // ── Round breakdown ───────────────────────────────────────────────────
         Text(
             "Round Breakdown",
             color      = Color.White.copy(alpha = 0.5f),
@@ -811,6 +934,7 @@ fun ResultScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // ── Play again button ─────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -835,6 +959,7 @@ fun ResultScreen(
     }
 }
 
+// ── Stat Card ─────────────────────────────────────────────────────────────────
 @Composable
 fun StatCard(modifier: Modifier = Modifier, label: String, value: String, color: Color) {
     Column(
@@ -850,6 +975,7 @@ fun StatCard(modifier: Modifier = Modifier, label: String, value: String, color:
     }
 }
 
+// ── Round Row ─────────────────────────────────────────────────────────────────
 @Composable
 fun RoundRow(round: Int, result: RoundResult) {
     val color = if (result.correct) Color(0xFF4CAF50) else Color(0xFFE53935)
@@ -861,8 +987,8 @@ fun RoundRow(round: Int, result: RoundResult) {
         verticalAlignment     = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("Round $round",                              color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
-        Text(if (result.correct) "✓ Correct" else "✗ Wrong", color = color, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-        Text("${result.reactionMs}ms",                   color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
+        Text("Round $round",                                  color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
+        Text(if (result.correct) "✓ Correct" else "✗ Wrong", color = color,                          fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text("${result.reactionMs}ms",                        color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
     }
 }

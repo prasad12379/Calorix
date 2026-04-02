@@ -12,36 +12,26 @@ import java.util.concurrent.TimeUnit
 class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != "android.intent.action.QUICKBOOT_POWERON"
+        ) return
 
-        // ✅ Only act on BOOT_COMPLETED broadcast
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+        // Read saved preferences
+        val prefs = context.getSharedPreferences(water_tracker.PREFS_NAME, Context.MODE_PRIVATE)
+        val reminderMinutes = prefs.getInt(water_tracker.KEY_REMINDER_MINUTES, 0).toLong()
+        val goalMl = (prefs.getFloat(water_tracker.KEY_WATER_GOAL, 2.5f) * 1000).toInt()
 
-        // ✅ Read saved reminder interval and goal from SharedPreferences
-        val prefs = context.getSharedPreferences(
-            water_tracker.PREFS_NAME,
-            Context.MODE_PRIVATE
-        )
+        // Only restart if user had set a reminder before
+        if (reminderMinutes <= 0) return
 
-        val savedMinutes = prefs.getInt(
-            water_tracker.KEY_REMINDER_MINUTES, 2
-        ).toLong()
-
-        val savedGoalLiters = prefs.getFloat(
-            water_tracker.KEY_WATER_GOAL, 2.5f
-        )
-
-        // ✅ Convert liters to ml (e.g. 2.5L → 2500 ml)
-        val goalMl = (savedGoalLiters * 1000).toInt()
-
-        // ✅ Restart the reminder chain after reboot
         val request = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInputData(
                 workDataOf(
-                    ReminderWorker.KEY_INTERVAL_MINUTES to savedMinutes,
+                    ReminderWorker.KEY_INTERVAL_MINUTES to reminderMinutes,
                     ReminderWorker.KEY_GOAL_ML to goalMl
                 )
             )
-            .setInitialDelay(savedMinutes, TimeUnit.MINUTES)
+            .setInitialDelay(reminderMinutes, TimeUnit.MINUTES)
             .addTag(water_tracker.WORK_TAG)
             .build()
 

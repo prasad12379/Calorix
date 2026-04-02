@@ -29,6 +29,17 @@
                 android:textColor="#22D3EE"
                 android:fontFamily="sans-serif-medium"/>
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/btnom"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                app:lottie_rawRes="@raw/stress_icon"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                android:clickable="true"
+                android:focusable="true"/>
+
             <!-- Water Tracker Icon -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnWaterTracker"
@@ -48,22 +59,23 @@
                     app:tint="#64B5F6"/>
             </androidx.cardview.widget.CardView>
 
-            <!-- GPS Status -->
-            <ImageView
-                android:id="@+id/ivGpsStatus"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_gps"
-                android:layout_marginEnd="12dp"
-                app:tint="#4CAF50"/>
-
             <!-- Notification Icon -->
             <ImageView
                 android:id="@+id/ivNotification"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_notifications"
+                android:layout_marginEnd="12dp"
                 app:tint="#FFFFFF"/>
+
+            <!-- GPS Status -->
+            <ImageView
+                android:id="@+id/ivGpsStatus"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_gps"
+
+                app:tint="#4CAF50"/>
         </LinearLayout>
 
         <!-- Timer Card -->

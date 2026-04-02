@@ -11,6 +11,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import com.airbnb.lottie.LottieAnimationView
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -70,17 +71,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val btnWalking = view.findViewById<CardView>(R.id.btnWalking)
         val btnCycling = view.findViewById<CardView>(R.id.btnCycling)
         val btnStart = view.findViewById<View>(R.id.btnStart)
-        val stress_btn=view.findViewById<CardView>(R.id.cardStressGame)
+        val stressGame=view.findViewById<CardView>(R.id.cardStressGame)
+        val btnom=view.findViewById<LottieAnimationView>(R.id.btnom)
+
+        btnom.setOnClickListener {
+            val intent = Intent(requireContext(), bhagwat_gita::class.java)
+            startActivity(intent)
+        }
+
+        stressGame.setOnClickListener {
+            val intent = Intent(requireContext(), Stress_Game::class.java)
+            startActivity(intent)
+        }
 
         // ✅ WATER TRACKER BUTTON
         val btnWaterTracker = view.findViewById<CardView>(R.id.btnWaterTracker)
         btnWaterTracker.setOnClickListener {
             val intent = Intent(requireContext(), water_tracker::class.java)
-            startActivity(intent)
-        }
-
-        stress_btn.setOnClickListener {
-            val intent = Intent(requireContext(), Stress_Game::class.java)
             startActivity(intent)
         }
 
