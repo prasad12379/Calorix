@@ -133,7 +133,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         btnCycling.setOnClickListener { selectMode("CYCLING") }
 
         btnStart.setOnClickListener {
-            val intent = Intent(requireContext(), CountdownActivity::class.java)
+            val intent = Intent(requireContext(), CountActivity::class.java)
             intent.putExtra("MODE", selectedMode)
             startActivity(intent)
         }

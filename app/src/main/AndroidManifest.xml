@@ -1,38 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- ══════════════════════════════════════ -->
-    <!--           PERMISSIONS                  -->
+    <!-- PERMISSIONS -->
     <!-- ══════════════════════════════════════ -->
-
     <!-- Network / Location (existing) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- you already have these two below -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Notifications (Android 13+) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- WorkManager foreground service -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" /> <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- WorkManager foreground service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-    <!-- Restart reminders after phone reboot -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- Keep CPU alive while worker fires notification -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- Exact alarms — required on Android 12+ for precise scheduling -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <!-- Fallback for Android 13+ (user doesn't need to grant manually) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- Restart reminders after phone reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Keep CPU alive while worker fires notification -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Exact alarms — required on Android 12+ for precise scheduling -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" /> <!-- Fallback for Android 13+ (user doesn't need to grant manually) -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
-    <!-- ══════════════════════════════════════ -->
-    <!--           APPLICATION                  -->
-    <!-- ══════════════════════════════════════ -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -40,35 +27,62 @@
         android:theme="@style/Theme.Run"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".CountActivity"
+            android:exported="false"
+            android:label="@string/title_activity_count"
+            android:theme="@style/Theme.Run" />
 
-        <!-- ── Activities ── -->
+        <activity
+            android:name=".WorkoutActivity"
+            android:exported="false"
+            android:label="@string/title_activity_wt"
+            android:theme="@style/Theme.Run" /> <!-- ── Activities ── -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".MainActivity"           android:exported="false" />
-        <activity android:name=".SignInActivity"         android:exported="false" />
-        <activity android:name=".SignupActivity"         android:exported="false" />
-        <activity android:name=".water_tracker"          android:exported="false" />
-        <activity android:name=".Water_take"             android:exported="true"
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".water_tracker"
+            android:exported="false" />
+        <activity
+            android:name=".Water_take"
+            android:exported="true"
             android:label="@string/title_activity_water_take" />
-        <activity android:name=".WorkoutActivity"        android:exported="false" />
-        <activity android:name=".WorkoutSummaryActivity" android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity android:name=".CountdownActivity"      android:exported="false" />
-        <activity android:name=".NotificationsActivity"  android:exported="false" />
-        <activity android:name=".AboutActivity"          android:exported="false" />
-        <activity android:name=".Stress_Game"            android:exported="false"
-            android:label="@string/title_activity_stress_game" />
-        <activity android:name=".bhagwat_gita"           android:exported="false"
-            android:label="@string/title_activity_bhagwat_gita" />
 
-        <!-- ── WorkManager foreground service (REQUIRED) ── -->
+        <activity
+            android:name=".WorkoutSummaryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Stress_Game"
+            android:exported="false"
+            android:label="@string/title_activity_stress_game" />
+        <activity
+            android:name=".bhagwat_gita"
+            android:exported="false"
+            android:label="@string/title_activity_bhagwat_gita" /> <!-- ── WorkManager foreground service (REQUIRED) ── -->
         <!--
              Without foregroundServiceType="dataSync" WorkManager crashes
              on Android 14+ when trying to promote work to foreground.
@@ -77,9 +91,7 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            tools:node="merge" />
-
-        <!-- ── BootReceiver ── -->
+            tools:node="merge" /> <!-- ── BootReceiver ── -->
         <!--
              Listens for BOOT_COMPLETED so reminders restart after phone reboot.
              Also covers Xiaomi / OnePlus fast-boot with QUICKBOOT_POWERON.
@@ -91,10 +103,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

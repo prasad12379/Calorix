@@ -6,4 +6,7 @@
     <string name="title_activity_stress_game">Stress_Game</string>
     <string name="title_activity_bhagwat_gita">bhagwat_gita</string>
     <string name="title_activity_water_take">Water_take</string>
+    <string name="title_activity_wt">WT</string>
+    <string name="title_activity_ct">CT</string>
+    <string name="title_activity_count">CountActivity</string>
 </resources>

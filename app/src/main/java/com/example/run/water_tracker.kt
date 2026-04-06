@@ -1,21 +1,17 @@
 package com.example.run
 
-// ══════════════════════════════════════════════════
-//  TESTING MODE — reminders fire every MINUTE
-//  To switch back to production (hours), just change:
-//      TimeUnit.MINUTES  →  TimeUnit.HOURS
-//  in the two places marked with  ← CHANGE THIS
-// ══════════════════════════════════════════════════
-
 import android.Manifest
-import android.R.attr.repeatCount
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
@@ -25,8 +21,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import java.util.concurrent.TimeUnit
@@ -49,14 +45,14 @@ class water_tracker : AppCompatActivity() {
     private lateinit var viewPulseRing: View
 
     private var currentWaterGoal = 2.5
-    private var currentReminderMinutes = 1   // ← default 1 for testing
+    private var currentReminderHours = 1
     private var isReminderActive = false
     private var pulseAnimator: AnimatorSet? = null
 
     companion object {
         const val WORK_TAG             = "water_reminder_work"
         const val PREFS_NAME           = "water_tracker_prefs"
-        const val KEY_REMINDER_MINUTES = "reminder_minutes"
+        const val KEY_REMINDER_HOURS   = "reminder_hours"
         const val KEY_WATER_GOAL       = "water_goal"
         const val KEY_REMINDER_ACTIVE  = "reminder_active"
     }
@@ -101,15 +97,15 @@ class water_tracker : AppCompatActivity() {
 
     private fun loadSavedPreferences() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        currentWaterGoal       = prefs.getFloat(KEY_WATER_GOAL, 2.5f).toDouble()
-        currentReminderMinutes = prefs.getInt(KEY_REMINDER_MINUTES, 1)  // ← default 1 min
-        isReminderActive       = prefs.getBoolean(KEY_REMINDER_ACTIVE, false)
+        currentWaterGoal    = prefs.getFloat(KEY_WATER_GOAL, 2.5f).toDouble()
+        currentReminderHours = prefs.getInt(KEY_REMINDER_HOURS, 1)
+        isReminderActive    = prefs.getBoolean(KEY_REMINDER_ACTIVE, false)
 
         val seekProgress = (currentWaterGoal * 10 - 5).toInt().coerceIn(0, seekBarWaterGoal.max)
         seekBarWaterGoal.progress = seekProgress
         tvWaterGoal.text = String.format("%.1f", currentWaterGoal)
-        updateReminderLabel(currentReminderMinutes)
-        ivClockHand.rotation = minutesToDegrees(currentReminderMinutes)
+        updateReminderLabel(currentReminderHours)
+        ivClockHand.rotation = hoursToDegrees(currentReminderHours)
     }
 
     private fun setupListeners() {
@@ -127,7 +123,6 @@ class water_tracker : AppCompatActivity() {
             }
         })
 
-        // ── TEST presets: 1 min / 2 min / 3 min ──
         btn1Hour.setOnClickListener  { selectPreset(1); animatePresetButton(btn1Hour) }
         btn2Hours.setOnClickListener { selectPreset(2); animatePresetButton(btn2Hours) }
         btn3Hours.setOnClickListener { selectPreset(3); animatePresetButton(btn3Hours) }
@@ -143,27 +138,26 @@ class water_tracker : AppCompatActivity() {
         }
     }
 
-    private fun selectPreset(minutes: Int) {
-        currentReminderMinutes = minutes
+    private fun selectPreset(hours: Int) {
+        currentReminderHours = hours
         savePreferences()
-        updateReminderLabel(minutes)
+        updateReminderLabel(hours)
         ivClockHand.animate()
-            .rotation(minutesToDegrees(minutes))
+            .rotation(hoursToDegrees(hours))
             .setDuration(350)
             .setInterpolator(OvershootInterpolator(1.5f))
             .start()
         if (isReminderActive) updateStatusCardText()
     }
 
-    private fun updateReminderLabel(minutes: Int) {
-        tvReminderTime.text = formatTime(minutes)
+    private fun updateReminderLabel(hours: Int) {
+        tvReminderTime.text = formatTime(hours)
     }
 
-    // ── Shows "1 min", "2 mins", "3 mins" in test mode ──
-    private fun formatTime(minutes: Int): String =
-        if (minutes == 1) "1 min" else "$minutes mins"
+    private fun formatTime(hours: Int): String =
+        if (hours == 1) "1 hour" else "$hours hours"
 
-    private fun minutesToDegrees(minutes: Int): Float = minutes * 30f
+    private fun hoursToDegrees(hours: Int): Float = hours * 30f
 
     private fun requestNotificationPermissionAndStart() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -178,35 +172,57 @@ class water_tracker : AppCompatActivity() {
         }
     }
 
-    private fun scheduleReminder() {
-        val goalInMl = (currentWaterGoal * 1000).toInt()
+    private fun requestBatteryOptimizationExemption() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pm = getSystemService(PowerManager::class.java)
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                try {
+                    val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    // Some devices don't support this intent — fail silently
+                }
+            }
+        }
+    }
 
-        val request = OneTimeWorkRequestBuilder<ReminderWorker>()
+    private fun scheduleReminder() {
+        requestBatteryOptimizationExemption()
+
+        val goalInMl    = (currentWaterGoal * 1000).toInt()
+        val intervalHrs = currentReminderHours.toLong()
+
+        val request = PeriodicWorkRequestBuilder<ReminderWorker>(
+            intervalHrs, TimeUnit.HOURS
+        )
             .setInputData(
                 workDataOf(
-                    ReminderWorker.KEY_INTERVAL_MINUTES to currentReminderMinutes.toLong(),
-                    ReminderWorker.KEY_GOAL_ML          to goalInMl
+                    ReminderWorker.KEY_INTERVAL_HOURS to intervalHrs,
+                    ReminderWorker.KEY_GOAL_ML        to goalInMl
                 )
             )
-            .setInitialDelay(currentReminderMinutes.toLong(), TimeUnit.MINUTES)  // ← CHANGE THIS to TimeUnit.HOURS for production
             .addTag(WORK_TAG)
             .build()
 
         WorkManager.getInstance(applicationContext)
-            .enqueueUniqueWork(WORK_TAG, ExistingWorkPolicy.REPLACE, request)
+            .enqueueUniquePeriodicWork(
+                WORK_TAG,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                request
+            )
 
         isReminderActive = true
         savePreferences()
         updateReminderStatusUI()
 
-        Toast.makeText(this, "✅ Reminder every ${formatTime(currentReminderMinutes)} (test mode)", Toast.LENGTH_LONG).show()
+        val label = formatTime(currentReminderHours)
+        Toast.makeText(this, "✅ Reminder every $label", Toast.LENGTH_LONG).show()
     }
 
     fun stopWaterReminders() {
-        val wm = WorkManager.getInstance(applicationContext)
-        wm.cancelUniqueWork(water_tracker.WORK_TAG)               // initial job
-        wm.cancelUniqueWork(water_tracker.WORK_TAG + "_next")     // rescheduled jobs
-        wm.cancelAllWorkByTag(water_tracker.WORK_TAG)             // catch any tagged stragglers
+        WorkManager.getInstance(applicationContext).cancelUniqueWork(WORK_TAG)
         isReminderActive = false
         savePreferences()
         updateReminderStatusUI()
@@ -234,7 +250,7 @@ class water_tracker : AppCompatActivity() {
     }
 
     private fun updateStatusCardText() {
-        tvStatusDetail.text = "Every ${formatTime(currentReminderMinutes)} · ${
+        tvStatusDetail.text = "Every ${formatTime(currentReminderHours)} · ${
             String.format("%.1f", currentWaterGoal)
         } L goal"
     }
@@ -242,23 +258,23 @@ class water_tracker : AppCompatActivity() {
     private fun startPulseAnimation() {
         pulseAnimator?.cancel()
 
-        val ring = viewPulseRing  // local reference avoids compiler confusion
+        val ring = viewPulseRing
 
         val scaleX = ObjectAnimator.ofFloat(ring, "scaleX", 1f, 1.6f, 1f)
         val scaleY = ObjectAnimator.ofFloat(ring, "scaleY", 1f, 1.6f, 1f)
-        val alpha  = ObjectAnimator.ofFloat(ring, "alpha",  0.5f, 0f, 0.5f)
+        val alpha  = ObjectAnimator.ofFloat(ring, "alpha", 0.5f, 0f, 0.5f)
 
-        // ✅ DO NOT use apply{} block — set properties directly on the instance
-        //    to avoid Kotlin compiler confusing .repeatCount with android.R.attr.repeatCount
-        val set = AnimatorSet()
-        set.playTogether(scaleX, scaleY, alpha)
-        set.duration = 1600
-        set.start()
-
-        // Repeat each individual animator instead of the set (AnimatorSet has no repeatCount)
         scaleX.repeatCount = ValueAnimator.INFINITE
         scaleY.repeatCount = ValueAnimator.INFINITE
         alpha.repeatCount  = ValueAnimator.INFINITE
+
+        scaleX.duration = 1600
+        scaleY.duration = 1600
+        alpha.duration  = 1600
+
+        val set = AnimatorSet()
+        set.playTogether(scaleX, scaleY, alpha)
+        set.start()
 
         pulseAnimator = set
     }
@@ -275,8 +291,10 @@ class water_tracker : AppCompatActivity() {
         val sx = ObjectAnimator.ofFloat(view, "scaleX", 1f, 0.93f, 1.05f, 1f)
         val sy = ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.93f, 1.05f, 1f)
         AnimatorSet().apply {
-            playTogether(sx, sy); duration = 300
-            interpolator = OvershootInterpolator(2f); start()
+            playTogether(sx, sy)
+            duration = 300
+            interpolator = OvershootInterpolator(2f)
+            start()
         }
     }
 
@@ -291,7 +309,7 @@ class water_tracker : AppCompatActivity() {
     fun savePreferences() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit()
             .putFloat(KEY_WATER_GOAL, currentWaterGoal.toFloat())
-            .putInt(KEY_REMINDER_MINUTES, currentReminderMinutes)
+            .putInt(KEY_REMINDER_HOURS, currentReminderHours)
             .putBoolean(KEY_REMINDER_ACTIVE, isReminderActive)
             .apply()
     }
@@ -300,7 +318,10 @@ class water_tracker : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "reminder_channel", "Water Reminder", NotificationManager.IMPORTANCE_HIGH
-            ).apply { description = "Periodic water intake reminders"; enableVibration(true) }
+            ).apply {
+                description = "Periodic water intake reminders"
+                enableVibration(true)
+            }
             getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
