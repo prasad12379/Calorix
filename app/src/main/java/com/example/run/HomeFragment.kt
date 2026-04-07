@@ -87,7 +87,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // ✅ WATER TRACKER BUTTON
         val btnWaterTracker = view.findViewById<CardView>(R.id.btnWaterTracker)
         btnWaterTracker.setOnClickListener {
-            val intent = Intent(requireContext(), water_tracker::class.java)
+            val intent = Intent(requireContext(), water_tracker ::class.java)
             startActivity(intent)
         }
 

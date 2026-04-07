@@ -21,7 +21,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -44,23 +46,30 @@ class water_tracker : AppCompatActivity() {
     private lateinit var tvReminderBadge: TextView
     private lateinit var viewPulseRing: View
 
-    private var currentWaterGoal = 2.5
+    private var currentWaterGoal     = 2.5
     private var currentReminderHours = 1
-    private var isReminderActive = false
+    private var isReminderActive     = false
     private var pulseAnimator: AnimatorSet? = null
 
     companion object {
-        const val WORK_TAG             = "water_reminder_work"
-        const val PREFS_NAME           = "water_tracker_prefs"
-        const val KEY_REMINDER_HOURS   = "reminder_hours"
-        const val KEY_WATER_GOAL       = "water_goal"
-        const val KEY_REMINDER_ACTIVE  = "reminder_active"
+        const val WORK_TAG            = "water_reminder_work"
+        const val PREFS_NAME          = "water_tracker_prefs"
+        const val KEY_REMINDER_HOURS  = "reminder_hours"
+        const val KEY_WATER_GOAL      = "water_goal"
+        const val KEY_REMINDER_ACTIVE = "reminder_active"
+
+        // WorkManager minimum is 15 minutes — enforce this
+        const val MIN_INTERVAL_MINUTES = 15L
     }
 
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) scheduleReminder()
-            else Toast.makeText(this, "Enable notifications in Settings.", Toast.LENGTH_LONG).show()
+            else Toast.makeText(
+                this,
+                "Please enable notifications in Settings to receive water reminders.",
+                Toast.LENGTH_LONG
+            ).show()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,15 +106,15 @@ class water_tracker : AppCompatActivity() {
 
     private fun loadSavedPreferences() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        currentWaterGoal    = prefs.getFloat(KEY_WATER_GOAL, 2.5f).toDouble()
+        currentWaterGoal     = prefs.getFloat(KEY_WATER_GOAL, 2.5f).toDouble()
         currentReminderHours = prefs.getInt(KEY_REMINDER_HOURS, 1)
-        isReminderActive    = prefs.getBoolean(KEY_REMINDER_ACTIVE, false)
+        isReminderActive     = prefs.getBoolean(KEY_REMINDER_ACTIVE, false)
 
         val seekProgress = (currentWaterGoal * 10 - 5).toInt().coerceIn(0, seekBarWaterGoal.max)
         seekBarWaterGoal.progress = seekProgress
-        tvWaterGoal.text = String.format("%.1f", currentWaterGoal)
+        tvWaterGoal.text          = String.format("%.1f", currentWaterGoal)
         updateReminderLabel(currentReminderHours)
-        ivClockHand.rotation = hoursToDegrees(currentReminderHours)
+        ivClockHand.rotation      = hoursToDegrees(currentReminderHours)
     }
 
     private fun setupListeners() {
@@ -123,12 +132,13 @@ class water_tracker : AppCompatActivity() {
             }
         })
 
-        btn1Hour.setOnClickListener  { selectPreset(1); animatePresetButton(btn1Hour) }
-        btn2Hours.setOnClickListener { selectPreset(2); animatePresetButton(btn2Hours) }
-        btn3Hours.setOnClickListener { selectPreset(3); animatePresetButton(btn3Hours) }
+        btn1Hour.setOnClickListener  { selectPreset(1);  animatePresetButton(btn1Hour)  }
+        btn2Hours.setOnClickListener { selectPreset(2);  animatePresetButton(btn2Hours) }
+        btn3Hours.setOnClickListener { selectPreset(3);  animatePresetButton(btn3Hours) }
 
         btnDrinkWater.setOnClickListener {
             bounceView(btnDrinkWater)
+            requestBatteryOptimizationExemption()   // ask MIUI to whitelist BEFORE scheduling
             requestNotificationPermissionAndStart()
         }
 
@@ -147,7 +157,10 @@ class water_tracker : AppCompatActivity() {
             .setDuration(350)
             .setInterpolator(OvershootInterpolator(1.5f))
             .start()
-        if (isReminderActive) updateStatusCardText()
+        if (isReminderActive) {
+            // Re-schedule with new interval
+            scheduleReminder()
+        }
     }
 
     private fun updateReminderLabel(hours: Int) {
@@ -162,7 +175,8 @@ class water_tracker : AppCompatActivity() {
     private fun requestNotificationPermissionAndStart() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
-                android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
                 scheduleReminder()
             } else {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -172,40 +186,64 @@ class water_tracker : AppCompatActivity() {
         }
     }
 
+    // ── KEY FIX: Open MIUI battery whitelist screen ───────────────────────
     private fun requestBatteryOptimizationExemption() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val pm = getSystemService(PowerManager::class.java)
             if (!pm.isIgnoringBatteryOptimizations(packageName)) {
                 try {
+                    // This opens the exact battery exemption dialog
                     val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                         data = Uri.parse("package:$packageName")
                     }
                     startActivity(intent)
+                    Toast.makeText(
+                        this,
+                        "Please tap 'Allow' to receive notifications when app is closed",
+                        Toast.LENGTH_LONG
+                    ).show()
                 } catch (e: Exception) {
-                    // Some devices don't support this intent — fail silently
+                    // Fallback: open general battery settings
+                    try {
+                        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
                 }
             }
         }
     }
 
     private fun scheduleReminder() {
-        requestBatteryOptimizationExemption()
-
         val goalInMl    = (currentWaterGoal * 1000).toInt()
-        val intervalHrs = currentReminderHours.toLong()
+
+        // ── KEY FIX: WorkManager minimum is 15 min ────────────────────────
+        // Convert hours to minutes and enforce the 15-min minimum
+        val intervalMinutes = maxOf(
+            currentReminderHours * 60L,
+            MIN_INTERVAL_MINUTES
+        )
+
+        // Constraints — no network needed, run even on low battery
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresBatteryNotLow(false)
+            .build()
 
         val request = PeriodicWorkRequestBuilder<ReminderWorker>(
-            intervalHrs, TimeUnit.HOURS
+            intervalMinutes, TimeUnit.MINUTES
         )
+            .setConstraints(constraints)
             .setInputData(
                 workDataOf(
-                    ReminderWorker.KEY_INTERVAL_HOURS to intervalHrs,
+                    ReminderWorker.KEY_INTERVAL_HOURS to currentReminderHours.toLong(),
                     ReminderWorker.KEY_GOAL_ML        to goalInMl
                 )
             )
             .addTag(WORK_TAG)
             .build()
 
+        // UPDATE replaces the old schedule if interval changed
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 WORK_TAG,
@@ -217,8 +255,11 @@ class water_tracker : AppCompatActivity() {
         savePreferences()
         updateReminderStatusUI()
 
-        val label = formatTime(currentReminderHours)
-        Toast.makeText(this, "✅ Reminder every $label", Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            "✅ Reminder set every ${formatTime(currentReminderHours)}",
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     fun stopWaterReminders() {
@@ -232,7 +273,7 @@ class water_tracker : AppCompatActivity() {
     private fun updateReminderStatusUI() {
         if (isReminderActive) {
             cardReminderStatus.visibility = View.VISIBLE
-            cardReminderStatus.alpha = 0f
+            cardReminderStatus.alpha      = 0f
             cardReminderStatus.translationY = -20f
             cardReminderStatus.animate()
                 .alpha(1f).translationY(0f).setDuration(350)
@@ -257,31 +298,22 @@ class water_tracker : AppCompatActivity() {
 
     private fun startPulseAnimation() {
         pulseAnimator?.cancel()
-
-        val ring = viewPulseRing
-
+        val ring  = viewPulseRing
         val scaleX = ObjectAnimator.ofFloat(ring, "scaleX", 1f, 1.6f, 1f)
         val scaleY = ObjectAnimator.ofFloat(ring, "scaleY", 1f, 1.6f, 1f)
-        val alpha  = ObjectAnimator.ofFloat(ring, "alpha", 0.5f, 0f, 0.5f)
-
+        val alpha  = ObjectAnimator.ofFloat(ring, "alpha",  0.5f, 0f, 0.5f)
         scaleX.repeatCount = ValueAnimator.INFINITE
         scaleY.repeatCount = ValueAnimator.INFINITE
         alpha.repeatCount  = ValueAnimator.INFINITE
-
-        scaleX.duration = 1600
-        scaleY.duration = 1600
-        alpha.duration  = 1600
-
-        val set = AnimatorSet()
-        set.playTogether(scaleX, scaleY, alpha)
-        set.start()
-
-        pulseAnimator = set
+        scaleX.duration    = 1600
+        scaleY.duration    = 1600
+        alpha.duration     = 1600
+        pulseAnimator = AnimatorSet().apply { playTogether(scaleX, scaleY, alpha); start() }
     }
 
     private fun stopPulseAnimation() {
         pulseAnimator?.cancel()
-        pulseAnimator = null
+        pulseAnimator        = null
         viewPulseRing.scaleX = 1f
         viewPulseRing.scaleY = 1f
         viewPulseRing.alpha  = 0.4f
@@ -292,7 +324,7 @@ class water_tracker : AppCompatActivity() {
         val sy = ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.93f, 1.05f, 1f)
         AnimatorSet().apply {
             playTogether(sx, sy)
-            duration = 300
+            duration     = 300
             interpolator = OvershootInterpolator(2f)
             start()
         }
@@ -317,12 +349,16 @@ class water_tracker : AppCompatActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "reminder_channel", "Water Reminder", NotificationManager.IMPORTANCE_HIGH
+                "reminder_channel",
+                "Water Reminder",
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Periodic water intake reminders"
+                description      = "Periodic water intake reminders"
                 enableVibration(true)
+                vibrationPattern = longArrayOf(0, 300, 100, 300)
             }
-            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            getSystemService(NotificationManager::class.java)
+                .createNotificationChannel(channel)
         }
     }
 }

@@ -9,4 +9,9 @@
     <string name="title_activity_wt">WT</string>
     <string name="title_activity_ct">CT</string>
     <string name="title_activity_count">CountActivity</string>
+    <string name="title_activity_chatbot_fragment">ChatbotFragment</string>
+    <string name="title_activity_pf">PF</string>
+    <string name="title_activity_af">AF</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_activity_water_tracker">WaterTrackerActivity</string>
 </resources>

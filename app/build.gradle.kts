@@ -82,7 +82,8 @@ dependencies {
     // ── Compose extras ───────────────────────────────────────────────────
     implementation("androidx.activity:activity-compose:1.9.3")          // ← fixed: 1.9.x → 1.9.3
     implementation("androidx.compose.material3:material3:1.3.1")        // ← fixed: 1.x.x → 1.3.1
-    implementation("androidx.compose.animation:animation:1.7.5")        // ← fixed: 1.x.x → 1.7.5
+    implementation("androidx.compose.animation:animation:1.7.5")
+    implementation(libs.androidx.compose.ui.geometry)        // ← fixed: 1.x.x → 1.7.5
 
     // ── Testing ──────────────────────────────────────────────────────────
     testImplementation(libs.junit)
@@ -92,4 +93,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }

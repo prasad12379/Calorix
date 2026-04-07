@@ -3,7 +3,9 @@ package com.example.run
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -12,22 +14,35 @@ import java.util.concurrent.TimeUnit
 class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
-            intent.action != "android.intent.action.QUICKBOOT_POWERON") return
+        val action = intent.action ?: return
+        if (action != Intent.ACTION_BOOT_COMPLETED &&
+            action != "android.intent.action.QUICKBOOT_POWERON") return
 
-        val prefs         = context.getSharedPreferences(water_tracker.PREFS_NAME, Context.MODE_PRIVATE)
-        val isActive      = prefs.getBoolean(water_tracker.KEY_REMINDER_ACTIVE, false)
-        val intervalHours = prefs.getInt(water_tracker.KEY_REMINDER_HOURS, 1).toLong()
-        val goalMl        = (prefs.getFloat(water_tracker.KEY_WATER_GOAL, 2.5f) * 1000).toInt()
+        // Restore reminder if it was active before reboot
+        val prefs = context.getSharedPreferences(
+            water_tracker.PREFS_NAME, Context.MODE_PRIVATE
+        )
+        val wasActive    = prefs.getBoolean(water_tracker.KEY_REMINDER_ACTIVE, false)
+        val hours        = prefs.getInt(water_tracker.KEY_REMINDER_HOURS, 1)
+        val goalL        = prefs.getFloat(water_tracker.KEY_WATER_GOAL, 2.5f)
+        val goalMl       = (goalL * 1000).toInt()
 
-        if (!isActive || intervalHours <= 0) return
+        if (!wasActive) return  // user had stopped reminders — don't restart
+
+        val intervalMinutes = maxOf(hours * 60L, 15L)
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresBatteryNotLow(false)
+            .build()
 
         val request = PeriodicWorkRequestBuilder<ReminderWorker>(
-            intervalHours, TimeUnit.HOURS
+            intervalMinutes, TimeUnit.MINUTES
         )
+            .setConstraints(constraints)
             .setInputData(
                 workDataOf(
-                    ReminderWorker.KEY_INTERVAL_HOURS to intervalHours,
+                    ReminderWorker.KEY_INTERVAL_HOURS to hours.toLong(),
                     ReminderWorker.KEY_GOAL_ML        to goalMl
                 )
             )

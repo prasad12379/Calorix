@@ -32,8 +32,8 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navHome -> loadFragment(HomeFragment())
                 R.id.navProfile -> loadFragment(ProfileFragment())
-                R.id.navActivity -> loadFragment(ActivityFragment())
-                R.id.navProgress -> loadFragment(ProgressFragment())
+                R.id.navActivity -> loadFragment(AF())
+                R.id.navProgress -> loadFragment(ChatbotFragment())
             }
             true
         }
