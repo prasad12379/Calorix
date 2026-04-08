@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -40,25 +39,22 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-// ─── Color Palette (HD Gradient Schema) ────────────────────────────────────────
-// Base tones from: Charcoal #272F2D | Sienna #6E2B1E | Steel Blue #8FAEC0
-private val BgDeep        = Color(0xFF1C2220)   // deeper charcoal bg
-private val BgDark        = Color(0xFF272F2D)   // primary charcoal
-private val BgCard        = Color(0xFF2E3836)   // card surface (lighter charcoal)
-private val BgCardLight   = Color(0xFF364240)   // elevated card
-private val SiennaDeep    = Color(0xFF4A1C12)   // deep sienna
-private val SiennaMid     = Color(0xFF6E2B1E)   // primary sienna accent
-private val SiennaLight   = Color(0xFF9B4030)   // lighter sienna
-private val SiennaGlow    = Color(0xFFBF6050)   // warm sienna glow
-private val SteelDeep     = Color(0xFF5A7A8A)   // deep steel blue
-private val SteelMid      = Color(0xFF8FAEC0)   // primary steel blue
-private val SteelLight    = Color(0xFFB0CCDA)   // lighter steel
-private val SteelGlow     = Color(0xFFCCDEE8)   // soft steel glow
-private val SubtleBorder  = Color(0xFF3D4D4A)   // subtle dark border
-private val TextPrimary   = Color(0xFFEEEEEC)   // off-white primary text
-private val TextMuted     = Color(0xFF8A9E9A)   // muted teal-gray text
+// ─── Color Palette ─────────────────────────────────────────────────────────────
+private val BgBlack      = Color(0xFF000000)
+private val BgDark       = Color(0xFF111111)
+private val BgCard       = Color(0xFF1C1C1C)
+private val BgCardLight  = Color(0xFF2A2A2A)
+private val GrayDark     = Color(0xFF3D3D3D)
+private val GrayMid      = Color(0xFF6B6B6B)
+private val GrayLight    = Color(0xFF9E9E9E)
+private val BlueVivid    = Color(0xFF0083C9)
+private val BlueDark     = Color(0xFF005A8C)
+private val BlueDeep     = Color(0xFF003D63)
+private val BlueLight    = Color(0xFF29A8E8)
+private val SubtleBorder = Color(0xFF2C2C2C)
+private val TextPrimary  = Color(0xFFF5F5F5)
+private val TextMuted    = Color(0xFF8A8A8A)
 
-// ─── Suggestion Data ───────────────────────────────────────────────────────────
 private val suggestions = listOf(
     "🏃 How do I improve my running speed?",
     "🥗 What should I eat after a workout?",
@@ -66,7 +62,6 @@ private val suggestions = listOf(
 )
 
 class ChatbotFragment : Fragment() {
-
     private lateinit var apiInterface: ApiInterface
 
     override fun onCreateView(
@@ -76,26 +71,19 @@ class ChatbotFragment : Fragment() {
     ): View {
         initRetrofit()
         return ComposeView(requireContext()).apply {
-            setContent {
-                MaterialTheme {
-                    MiliChatScreen(apiInterface = apiInterface)
-                }
-            }
+            setContent { MaterialTheme { MiliChatScreen(apiInterface = apiInterface) } }
         }
     }
 
     private fun initRetrofit() {
-        val retrofit = Retrofit.Builder()
+        apiInterface = Retrofit.Builder()
             .baseUrl("https://running-app-backend-p48y.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        apiInterface = retrofit.create(ApiInterface::class.java)
+            .create(ApiInterface::class.java)
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  ROOT SCREEN
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun MiliChatScreen(apiInterface: ApiInterface) {
     val messages  = remember { mutableStateListOf<ChatMessage>() }
@@ -117,7 +105,6 @@ fun MiliChatScreen(apiInterface: ApiInterface) {
         inputText = ""
         isTyping  = true
         scrollToBottom()
-
         apiInterface.getFitnessResponse(text).enqueue(object : Callback<MyData> {
             override fun onResponse(call: Call<MyData>, response: Response<MyData>) {
                 isTyping = false
@@ -129,10 +116,7 @@ fun MiliChatScreen(apiInterface: ApiInterface) {
             }
             override fun onFailure(call: Call<MyData>, t: Throwable) {
                 isTyping = false
-                messages.add(ChatMessage(
-                    "Connection error: ${t.message ?: "Check your internet"} 🔌",
-                    isBot = true
-                ))
+                messages.add(ChatMessage("Connection error: ${t.message ?: "Check your internet"} 🔌", isBot = true))
                 scope.launch { listState.animateScrollToItem(messages.size - 1) }
             }
         })
@@ -141,79 +125,59 @@ fun MiliChatScreen(apiInterface: ApiInterface) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(BgDeep, BgDark, Color(0xFF1F2826))
-                )
-            )
+            .background(Brush.verticalGradient(colors = listOf(BgBlack, BgDark, Color(0xFF0A0A0A))))
             .imePadding()
     ) {
-        // ── HD Sienna blob — bottom left ───────────────────────────────────────
+        // Electric blue atmospheric glow — bottom left
         Box(
             modifier = Modifier
-                .size(300.dp)
+                .size(320.dp)
                 .offset(x = (-80).dp, y = 480.dp)
-                .blur(100.dp)
+                .blur(120.dp)
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            SiennaMid.copy(alpha = 0.35f),
-                            SiennaDeep.copy(alpha = 0.15f),
+                            BlueVivid.copy(alpha = 0.18f),
+                            BlueDeep.copy(alpha = 0.06f),
                             Color.Transparent
                         ),
-                        radius = 500f
-                    ),
-                    shape = CircleShape
+                        radius = 550f
+                    ), CircleShape
                 )
         )
-        // ── HD Steel blob — top right ──────────────────────────────────────────
+        // Gray glow — top right
         Box(
             modifier = Modifier
-                .size(260.dp)
+                .size(200.dp)
                 .align(Alignment.TopEnd)
-                .offset(x = 60.dp, y = (-40).dp)
-                .blur(90.dp)
+                .offset(x = 40.dp, y = (-20).dp)
+                .blur(80.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(
-                            SteelMid.copy(alpha = 0.2f),
-                            SteelDeep.copy(alpha = 0.08f),
-                            Color.Transparent
-                        ),
-                        radius = 420f
-                    ),
-                    shape = CircleShape
+                        colors = listOf(GrayDark.copy(alpha = 0.25f), Color.Transparent),
+                        radius = 350f
+                    ), CircleShape
                 )
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
             MiliHeader()
-
             Box(modifier = Modifier.weight(1f)) {
                 if (messages.isEmpty() && !isTyping) {
                     MiliEmptyState(onSuggestionClick = { sendMessage(it) })
                 } else {
                     LazyColumn(
-                        state    = listState,
+                        state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
-                            start  = 20.dp,
-                            end    = 20.dp,
-                            top    = 20.dp,
-                            bottom = 16.dp
+                            start = 20.dp, end = 20.dp,
+                            top = 20.dp, bottom = 16.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
+                        // ✅ FIX: Removed AnimatedVisibility — renders bubbles directly
                         itemsIndexed(messages) { _, msg ->
-                            androidx.compose.animation.AnimatedVisibility(
-                                visible = true,
-                                enter   = fadeIn(tween(300)) + slideInVertically(
-                                    tween(300), initialOffsetY = { it / 3 }
-                                )
-                            ) {
-                                if (msg.isBot) MiliBubble(msg.message)
-                                else UserBubble(msg.message)
-                            }
+                            if (msg.isBot) MiliBubble(msg.message) else UserBubble(msg.message)
                         }
                         if (isTyping) {
                             item { MiliTypingBubble() }
@@ -221,128 +185,89 @@ fun MiliChatScreen(apiInterface: ApiInterface) {
                     }
                 }
             }
-
             MiliInputBar(
-                value         = inputText,
+                value = inputText,
                 onValueChange = { inputText = it },
-                onSend        = { sendMessage(inputText) }
+                onSend = { sendMessage(inputText) }
             )
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  HEADER
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun MiliHeader() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        BgDeep,
-                        BgDeep.copy(alpha = 0f)
-                    )
-                )
-            )
             .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
-        Surface(
-            shape           = RoundedCornerShape(50),
-            color           = Color.Transparent,
-            shadowElevation = 0.dp,
-            modifier        = Modifier
+        Box(
+            modifier = Modifier
                 .wrapContentWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(BgCard, BgCardLight)
-                    ),
-                    shape = RoundedCornerShape(50)
-                )
+                .clip(RoundedCornerShape(50))
+                .background(Brush.linearGradient(colors = listOf(BgCard, BgCardLight)))
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SubtleBorder, SteelDeep.copy(alpha = 0.3f))
-                    ),
-                    shape = RoundedCornerShape(50)
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(BlueVivid.copy(alpha = 0.6f), SubtleBorder)),
+                    RoundedCornerShape(50)
                 )
+                .padding(horizontal = 14.dp, vertical = 8.dp)
         ) {
             Row(
-                modifier          = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 val pulse = rememberInfiniteTransition(label = "pulse")
                 val scale by pulse.animateFloat(
-                    initialValue  = 0.7f,
-                    targetValue   = 1.2f,
+                    initialValue = 0.7f,
+                    targetValue  = 1.3f,
                     animationSpec = infiniteRepeatable(tween(700), RepeatMode.Reverse),
-                    label         = "scale"
+                    label = "scale"
                 )
-                // Pulsing dot with steel blue gradient
                 Box(
                     modifier = Modifier
                         .size((6 * scale).dp)
                         .background(
-                            Brush.radialGradient(
-                                colors = listOf(SteelLight, SteelMid)
-                            ),
+                            Brush.radialGradient(colors = listOf(BlueLight, BlueVivid)),
                             CircleShape
                         )
                 )
                 Text(
-                    text          = "Mili · Online",
-                    color         = TextPrimary,
-                    fontSize      = 12.sp,
-                    fontWeight    = FontWeight.Medium,
+                    "Mili · Online",
+                    color = GrayLight,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
                     letterSpacing = 0.4.sp
                 )
             }
         }
 
         Spacer(Modifier.height(16.dp))
-
-        Text(
-            text       = "Hey there 👋",
-            fontSize   = 14.sp,
-            color      = TextMuted,
-            fontWeight = FontWeight.Normal
-        )
+        Text("Hey there 👋", fontSize = 14.sp, color = TextMuted)
         Spacer(Modifier.height(4.dp))
         Text(
-            text          = "What's on your\nfitness mind?",
-            fontSize      = 30.sp,
-            fontWeight    = FontWeight.Bold,
-            color         = TextPrimary,
-            lineHeight    = 36.sp,
+            "What's on your\nfitness mind?",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            lineHeight = 36.sp,
             letterSpacing = (-0.8).sp
         )
-
         Spacer(Modifier.height(16.dp))
 
-        // HD gradient divider — sienna to steel
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
                 .background(
                     Brush.horizontalGradient(
-                        colors = listOf(
-                            SiennaMid,
-                            SteelMid.copy(alpha = 0.5f),
-                            Color.Transparent
-                        )
+                        colors = listOf(BlueVivid, GrayDark.copy(alpha = 0.4f), Color.Transparent)
                     )
                 )
         )
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  EMPTY STATE
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun MiliEmptyState(onSuggestionClick: (String) -> Unit) {
     Column(
@@ -352,10 +277,10 @@ fun MiliEmptyState(onSuggestionClick: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text          = "Quick questions",
-            fontSize      = 11.sp,
-            fontWeight    = FontWeight.SemiBold,
-            color         = TextMuted,
+            "Quick questions",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = TextMuted,
             letterSpacing = 1.4.sp
         )
         suggestions.forEach { text ->
@@ -367,88 +292,70 @@ fun MiliEmptyState(onSuggestionClick: (String) -> Unit) {
 @Composable
 fun MiliSuggestionChip(text: String, onClick: () -> Unit) {
     Surface(
-        onClick         = onClick,
-        modifier        = Modifier
-            .fillMaxWidth()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(BgCard, BgCardLight)
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ),
-        shape           = RoundedCornerShape(16.dp),
-        color           = Color.Transparent,
-        border          = BorderStroke(
-            width = 1.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(SubtleBorder, SteelDeep.copy(alpha = 0.2f))
-            )
-        ),
-        shadowElevation = 4.dp,
-        tonalElevation  = 0.dp
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.Transparent,
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(colors = listOf(SubtleBorder, BlueVivid.copy(alpha = 0.3f)))
+        )
     ) {
-        Row(
-            modifier              = Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
-            verticalAlignment     = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.linearGradient(colors = listOf(BgCard, BgCardLight)))
         ) {
-            Text(
-                text       = text,
-                fontSize   = 13.sp,
-                color      = TextPrimary,
-                fontWeight = FontWeight.Medium,
-                modifier   = Modifier.weight(1f)
-            )
-            // Arrow badge with sienna gradient
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(SiennaMid, SiennaLight)
-                        )
-                    )
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "→", fontSize = 13.sp, color = TextPrimary)
+                Text(
+                    text = text,
+                    fontSize = 13.sp,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.weight(1f)
+                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Brush.linearGradient(colors = listOf(BlueDark, BlueVivid)))
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    Text("→", fontSize = 13.sp, color = TextPrimary)
+                }
             }
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  BUBBLES
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun UserBubble(text: String) {
-    Row(
-        modifier              = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         Box(
             modifier = Modifier
                 .widthIn(max = 270.dp)
                 .clip(RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp))
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(SiennaDeep, SiennaMid, SiennaLight),
-                        start  = Offset(0f, 0f),
-                        end    = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                        colors = listOf(BlueDeep, BlueDark, BlueVivid),
+                        start = Offset(0f, 0f),
+                        end   = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                     )
                 )
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SiennaGlow.copy(alpha = 0.4f), Color.Transparent)
-                    ),
-                    shape = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(BlueLight.copy(alpha = 0.4f), BlueDeep)),
+                    RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
                 )
                 .padding(horizontal = 18.dp, vertical = 13.dp)
         ) {
             Text(
-                text       = text,
-                color      = TextPrimary,
-                fontSize   = 14.sp,
+                text = text,
+                color = TextPrimary,
+                fontSize = 14.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -458,26 +365,18 @@ fun UserBubble(text: String) {
 
 @Composable
 fun MiliBubble(text: String) {
-    Row(
-        modifier          = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        // Avatar with steel gradient
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
         Box(
             modifier = Modifier
                 .size(30.dp)
                 .background(
-                    Brush.linearGradient(
-                        colors = listOf(SteelDeep, SteelMid)
-                    ),
+                    Brush.linearGradient(colors = listOf(GrayDark, GrayMid)),
                     CircleShape
                 )
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SteelLight.copy(alpha = 0.5f), Color.Transparent)
-                    ),
-                    shape = CircleShape
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(BlueVivid.copy(alpha = 0.5f), GrayDark)),
+                    CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -488,44 +387,30 @@ fun MiliBubble(text: String) {
             modifier = Modifier
                 .widthIn(max = 270.dp)
                 .clip(RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp))
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(BgCard, BgCardLight)
-                    )
-                )
+                .background(Brush.linearGradient(colors = listOf(BgCard, BgCardLight)))
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SubtleBorder, Color.Transparent)
-                    ),
-                    shape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(SubtleBorder, Color.Transparent)),
+                    RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
                 )
         ) {
-            // Steel blue accent bar
             Box(
                 modifier = Modifier
                     .width(3.dp)
                     .fillMaxHeight()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(SteelMid, SteelDeep)
-                        )
-                    )
+                    .background(Brush.verticalGradient(colors = listOf(BlueVivid, BlueDark)))
             )
             Text(
-                text      = text,
-                modifier  = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
-                color     = TextPrimary,
-                fontSize  = 14.sp,
+                text = text,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+                color = TextPrimary,
+                fontSize = 14.sp,
                 lineHeight = 21.sp
             )
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  TYPING INDICATOR
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun MiliTypingBubble() {
     Row(verticalAlignment = Alignment.Bottom) {
@@ -533,17 +418,13 @@ fun MiliTypingBubble() {
             modifier = Modifier
                 .size(30.dp)
                 .background(
-                    Brush.linearGradient(
-                        colors = listOf(SteelDeep, SteelMid)
-                    ),
+                    Brush.linearGradient(colors = listOf(GrayDark, GrayMid)),
                     CircleShape
                 )
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SteelLight.copy(alpha = 0.5f), Color.Transparent)
-                    ),
-                    shape = CircleShape
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(BlueVivid.copy(alpha = 0.5f), GrayDark)),
+                    CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -553,23 +434,17 @@ fun MiliTypingBubble() {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp))
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(BgCard, BgCardLight)
-                    )
-                )
+                .background(Brush.linearGradient(colors = listOf(BgCard, BgCardLight)))
                 .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SubtleBorder, Color.Transparent)
-                    ),
-                    shape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+                    1.dp,
+                    Brush.linearGradient(colors = listOf(SubtleBorder, Color.Transparent)),
+                    RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
                 )
         ) {
             Row(
-                modifier              = Modifier.padding(horizontal = 20.dp, vertical = 15.dp),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(3) { i -> BouncingDot(delayMs = i * 160) }
             }
@@ -581,12 +456,12 @@ fun MiliTypingBubble() {
 fun BouncingDot(delayMs: Int) {
     val transition = rememberInfiniteTransition(label = "dot$delayMs")
     val offsetY by transition.animateFloat(
-        initialValue  = 0f,
-        targetValue   = -7f,
+        initialValue = 0f,
+        targetValue  = -7f,
         animationSpec = infiniteRepeatable(
-            animation          = tween(420, easing = FastOutSlowInEasing),
-            repeatMode         = RepeatMode.Reverse,
-            initialStartOffset = StartOffset(delayMs)
+            tween(420, easing = FastOutSlowInEasing),
+            RepeatMode.Reverse,
+            StartOffset(delayMs)
         ),
         label = "bounce"
     )
@@ -595,125 +470,90 @@ fun BouncingDot(delayMs: Int) {
             .size(7.dp)
             .offset(y = offsetY.dp)
             .background(
-                Brush.radialGradient(
-                    colors = listOf(SiennaGlow, SiennaMid)
-                ),
+                Brush.radialGradient(colors = listOf(BlueLight, BlueVivid)),
                 CircleShape
             )
     )
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  INPUT BAR
-// ══════════════════════════════════════════════════════════════════════════════
 @Composable
-fun MiliInputBar(
-    value: String,
-    onValueChange: (String) -> Unit,
-    onSend: () -> Unit
-) {
+fun MiliInputBar(value: String, onValueChange: (String) -> Unit, onSend: () -> Unit) {
     val keyboard = LocalSoftwareKeyboardController.current
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        BgDeep.copy(alpha = 0.95f),
-                        BgDeep
-                    )
+                    colors = listOf(Color.Transparent, BgBlack.copy(alpha = 0.98f))
                 )
-            )
-            .border(
-                width = 0.dp,
-                color = Color.Transparent
             )
     ) {
         Row(
-            modifier              = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .navigationBarsPadding(),
-            verticalAlignment     = Alignment.Bottom,
+            verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Text field with gradient border
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(BgCard, BgCardLight)
-                        )
-                    )
+                    .background(Brush.linearGradient(colors = listOf(BgCard, BgCardLight)))
                     .border(
-                        width = 1.dp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(SubtleBorder, SteelDeep.copy(alpha = 0.3f))
-                        ),
-                        shape = RoundedCornerShape(20.dp)
+                        1.dp,
+                        Brush.linearGradient(colors = listOf(GrayDark, BlueVivid.copy(alpha = 0.4f))),
+                        RoundedCornerShape(20.dp)
                     )
             ) {
                 TextField(
-                    value         = value,
+                    value = value,
                     onValueChange = onValueChange,
-                    placeholder   = {
-                        Text(
-                            "Ask Mili anything…",
-                            color    = TextMuted,
-                            fontSize = 14.sp
-                        )
+                    placeholder = {
+                        Text("Ask Mili anything…", color = TextMuted, fontSize = 14.sp)
                     },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor   = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedIndicatorColor   = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor             = SiennaGlow,
+                        cursorColor             = BlueVivid,
                         focusedTextColor        = TextPrimary,
                         unfocusedTextColor      = TextPrimary
                     ),
-                    textStyle       = TextStyle(fontSize = 14.sp),
-                    modifier        = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(fontSize = 14.sp),
+                    modifier  = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                    keyboardActions = KeyboardActions(
-                        onSend = { onSend(); keyboard?.hide() }
-                    ),
+                    keyboardActions = KeyboardActions(onSend = { onSend(); keyboard?.hide() }),
                     singleLine = false,
                     maxLines   = 4
                 )
             }
-
-            // Send button — sienna gradient with glow border
             Box(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
                     .background(
                         Brush.linearGradient(
-                            colors = listOf(SiennaDeep, SiennaMid, SiennaLight),
-                            start  = Offset(0f, 0f),
-                            end    = Offset(50f, 50f)
+                            colors = listOf(BlueDark, BlueVivid, BlueLight),
+                            start  = Offset(0f, 50f),
+                            end    = Offset(50f, 0f)
                         )
                     )
                     .border(
-                        width = 1.dp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(SiennaGlow.copy(alpha = 0.6f), SiennaDeep)
-                        ),
-                        shape = CircleShape
+                        1.dp,
+                        Brush.linearGradient(colors = listOf(BlueLight.copy(alpha = 0.5f), BlueDark)),
+                        CircleShape
                     )
                     .clickable { onSend(); keyboard?.hide() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector        = Icons.Filled.ArrowUpward,
+                    Icons.Filled.ArrowUpward,
                     contentDescription = "Send",
-                    tint               = TextPrimary,
-                    modifier           = Modifier.size(20.dp)
+                    tint = TextPrimary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

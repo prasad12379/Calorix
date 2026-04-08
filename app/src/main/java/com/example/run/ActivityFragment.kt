@@ -33,6 +33,14 @@ class ActivityFragment : Fragment() {
     private var fullList = mutableListOf<ActivityItem>()
     private var currentFilter = "ALL"
 
+    // ── Color palette from image ──────────────────────────────────────────────
+    private val colorBlack       = "#000000"   // chip unselected background
+    private val colorDarkGray    = "#444444"   // secondary / stroke
+    private val colorMediumGray  = "#808080"   // divider / muted text
+    private val colorWhite       = "#FFFFFF"   // text on dark chips
+    private val colorBlue        = "#0088CC"   // active / selected chip accent
+    // ─────────────────────────────────────────────────────────────────────────
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,14 +59,20 @@ class ActivityFragment : Fragment() {
 
     private fun initViews(view: View) {
 
-        rvActivities = view.findViewById(R.id.rvActivities)
-        emptyState = view.findViewById(R.id.emptyState)
+        rvActivities     = view.findViewById(R.id.rvActivities)
+        emptyState       = view.findViewById(R.id.emptyState)
         tvTotalActivities = view.findViewById(R.id.tvTotalActivities)
 
-        chipAll = view.findViewById(R.id.chipAll)
+        chipAll     = view.findViewById(R.id.chipAll)
         chipRunning = view.findViewById(R.id.chipRunning)
         chipWalking = view.findViewById(R.id.chipWalking)
         chipCycling = view.findViewById(R.id.chipCycling)
+
+        // Set all chips to default (unselected) color on init
+        resetChipColors()
+
+        // Highlight the default selected chip
+        selectFilter("ALL")
 
         chipAll.setOnClickListener {
             selectFilter("ALL")
@@ -79,7 +93,6 @@ class ActivityFragment : Fragment() {
 
         // Start First Workout button
         view.findViewById<CardView>(R.id.btnStartFirstWorkout)?.setOnClickListener {
-            // TODO: Navigate to home fragment or workout activity
             Toast.makeText(requireContext(), "Start workout from Home tab", Toast.LENGTH_SHORT).show()
         }
     }
@@ -114,9 +127,6 @@ class ActivityFragment : Fragment() {
             return
         }
 
-        // Show loading state (optional)
-        // progressBar.visibility = View.VISIBLE
-
         val call = apiInterface.getActivities(email)
 
         call.enqueue(object : Callback<ActivityListResponse> {
@@ -126,21 +136,17 @@ class ActivityFragment : Fragment() {
                 response: Response<ActivityListResponse>
             ) {
 
-                // Hide loading
-                // progressBar.visibility = View.GONE
-
                 if (response.isSuccessful && response.body() != null) {
 
                     fullList = response.body()!!.data.toMutableList()
-
                     tvTotalActivities.text = "${fullList.size} total workouts"
 
                     if (fullList.isEmpty()) {
                         showEmptyState()
                     } else {
-                        // Apply current filter
                         filterList(currentFilter)
                     }
+
                 } else {
                     showEmptyState()
                     Toast.makeText(
@@ -152,9 +158,6 @@ class ActivityFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<ActivityListResponse>, t: Throwable) {
-                // Hide loading
-                // progressBar.visibility = View.GONE
-
                 showEmptyState()
                 Toast.makeText(
                     requireContext(),
@@ -165,7 +168,7 @@ class ActivityFragment : Fragment() {
         })
     }
 
-    // ✅ FILTER LOGIC
+    // ✅ FILTER LOGIC  — unchanged
     private fun filterList(type: String) {
 
         currentFilter = type
@@ -180,39 +183,43 @@ class ActivityFragment : Fragment() {
         }
 
         if (filtered.isEmpty()) {
-            // Show empty state for this filter
             rvActivities.visibility = View.GONE
-            emptyState.visibility = View.VISIBLE
+            emptyState.visibility   = View.VISIBLE
         } else {
             showRecycler(filtered)
         }
     }
 
-    // 🎨 UPDATE FILTER CHIP UI
+    // 🎨 UPDATE FILTER CHIP UI — new color scheme
     private fun selectFilter(type: String) {
-        // Reset all chips
-        chipAll.setCardBackgroundColor(Color.parseColor("#40FFFFFF"))
-        chipRunning.setCardBackgroundColor(Color.parseColor("#40FFFFFF"))
-        chipWalking.setCardBackgroundColor(Color.parseColor("#40FFFFFF"))
-        chipCycling.setCardBackgroundColor(Color.parseColor("#40FFFFFF"))
+        resetChipColors()   // all chips → unselected state
 
-        // Highlight selected chip
+        // Highlight selected chip with Blue accent
         when (type) {
-            "ALL" -> chipAll.setCardBackgroundColor(Color.parseColor("#4CAF50"))
-            "RUNNING" -> chipRunning.setCardBackgroundColor(Color.parseColor("#4CAF50"))
-            "WALKING" -> chipWalking.setCardBackgroundColor(Color.parseColor("#4CAF50"))
-            "CYCLING" -> chipCycling.setCardBackgroundColor(Color.parseColor("#4CAF50"))
+            "ALL"     -> chipAll.setCardBackgroundColor(Color.parseColor(colorBlue))
+            "RUNNING" -> chipRunning.setCardBackgroundColor(Color.parseColor(colorBlue))
+            "WALKING" -> chipWalking.setCardBackgroundColor(Color.parseColor(colorBlue))
+            "CYCLING" -> chipCycling.setCardBackgroundColor(Color.parseColor(colorBlue))
         }
+    }
+
+    /** Reset every chip to the dark-gray unselected background */
+    private fun resetChipColors() {
+        val unselected = Color.parseColor(colorDarkGray)
+        chipAll.setCardBackgroundColor(unselected)
+        chipRunning.setCardBackgroundColor(unselected)
+        chipWalking.setCardBackgroundColor(unselected)
+        chipCycling.setCardBackgroundColor(unselected)
     }
 
     private fun showRecycler(list: List<ActivityItem>) {
         rvActivities.visibility = View.VISIBLE
-        emptyState.visibility = View.GONE
+        emptyState.visibility   = View.GONE
         adapter.updateData(list)
     }
 
     private fun showEmptyState() {
         rvActivities.visibility = View.GONE
-        emptyState.visibility = View.VISIBLE
+        emptyState.visibility   = View.VISIBLE
     }
 }
