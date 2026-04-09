@@ -33,12 +33,17 @@ class ActivityFragment : Fragment() {
     private var fullList = mutableListOf<ActivityItem>()
     private var currentFilter = "ALL"
 
-    // ── Color palette from image ──────────────────────────────────────────────
-    private val colorBlack       = "#000000"   // chip unselected background
-    private val colorDarkGray    = "#444444"   // secondary / stroke
-    private val colorMediumGray  = "#808080"   // divider / muted text
-    private val colorWhite       = "#FFFFFF"   // text on dark chips
-    private val colorBlue        = "#0088CC"   // active / selected chip accent
+    // ── Color palette from ChatbotFragment ───────────────────────────────────
+    private val colorBgWhite       = "#FAF9FF"   // BgWhite  — screen background
+    private val colorBgLavender    = "#ECE8F5"   // BgLavender — subtle surface
+    private val colorDeepBlack     = "#0A0A0A"   // DeepBlack — header / user bubble / send btn
+    private val colorPureWhite     = "#FFFFFF"   // PureWhite — card / bot bubble bg
+    private val colorAccentViolet  = "#9B8FD4"   // AccentViolet — selected chip accent
+    private val colorHoloPink      = "#E8B4D8"   // HoloPink — decorative blob
+    private val colorHoloMint      = "#AEE8D8"   // HoloMint — online dot / decorative
+    private val colorSubtleGrey    = "#DDD8EE"   // SubtleGrey — borders / dividers
+    private val colorTextPrimary   = "#0A0A0A"   // TextPrimary — main labels
+    private val colorTextSecondary = "#7A7490"   // TextSecondary — muted / count text
     // ─────────────────────────────────────────────────────────────────────────
 
     override fun onCreateView(
@@ -59,8 +64,8 @@ class ActivityFragment : Fragment() {
 
     private fun initViews(view: View) {
 
-        rvActivities     = view.findViewById(R.id.rvActivities)
-        emptyState       = view.findViewById(R.id.emptyState)
+        rvActivities      = view.findViewById(R.id.rvActivities)
+        emptyState        = view.findViewById(R.id.emptyState)
         tvTotalActivities = view.findViewById(R.id.tvTotalActivities)
 
         chipAll     = view.findViewById(R.id.chipAll)
@@ -68,10 +73,14 @@ class ActivityFragment : Fragment() {
         chipWalking = view.findViewById(R.id.chipWalking)
         chipCycling = view.findViewById(R.id.chipCycling)
 
-        // Set all chips to default (unselected) color on init
-        resetChipColors()
+        // Apply BgWhite background to root view
+        view.setBackgroundColor(Color.parseColor(colorBgWhite))
 
-        // Highlight the default selected chip
+        // Style the total-activities label with TextSecondary colour
+        tvTotalActivities.setTextColor(Color.parseColor(colorTextSecondary))
+
+        // Reset chips to unselected state, then mark default
+        resetChipColors()
         selectFilter("ALL")
 
         chipAll.setOnClickListener {
@@ -91,9 +100,12 @@ class ActivityFragment : Fragment() {
             filterList("CYCLING")
         }
 
-        // Start First Workout button
-        view.findViewById<CardView>(R.id.btnStartFirstWorkout)?.setOnClickListener {
-            Toast.makeText(requireContext(), "Start workout from Home tab", Toast.LENGTH_SHORT).show()
+        // "Start First Workout" button — DeepBlack background (mirrors send button)
+        view.findViewById<CardView>(R.id.btnStartFirstWorkout)?.apply {
+            setCardBackgroundColor(Color.parseColor(colorDeepBlack))
+            setOnClickListener {
+                Toast.makeText(requireContext(), "Start workout from Home tab", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -168,7 +180,7 @@ class ActivityFragment : Fragment() {
         })
     }
 
-    // ✅ FILTER LOGIC  — unchanged
+    // ✅ FILTER LOGIC — unchanged
     private fun filterList(type: String) {
 
         currentFilter = type
@@ -190,22 +202,22 @@ class ActivityFragment : Fragment() {
         }
     }
 
-    // 🎨 UPDATE FILTER CHIP UI — new color scheme
+    // 🎨 UPDATE FILTER CHIP UI — Chatbot colour scheme
     private fun selectFilter(type: String) {
-        resetChipColors()   // all chips → unselected state
+        resetChipColors()   // all chips → unselected (BgLavender)
 
-        // Highlight selected chip with Blue accent
+        // Selected chip: AccentViolet background (mirrors the Lavender/Violet accent)
         when (type) {
-            "ALL"     -> chipAll.setCardBackgroundColor(Color.parseColor(colorBlue))
-            "RUNNING" -> chipRunning.setCardBackgroundColor(Color.parseColor(colorBlue))
-            "WALKING" -> chipWalking.setCardBackgroundColor(Color.parseColor(colorBlue))
-            "CYCLING" -> chipCycling.setCardBackgroundColor(Color.parseColor(colorBlue))
+            "ALL"     -> chipAll.setCardBackgroundColor(Color.parseColor(colorAccentViolet))
+            "RUNNING" -> chipRunning.setCardBackgroundColor(Color.parseColor(colorAccentViolet))
+            "WALKING" -> chipWalking.setCardBackgroundColor(Color.parseColor(colorAccentViolet))
+            "CYCLING" -> chipCycling.setCardBackgroundColor(Color.parseColor(colorAccentViolet))
         }
     }
 
-    /** Reset every chip to the dark-gray unselected background */
+    /** Reset every chip to SubtleGrey — the unselected surface used in chatbot borders/cards */
     private fun resetChipColors() {
-        val unselected = Color.parseColor(colorDarkGray)
+        val unselected = Color.parseColor(colorSubtleGrey)
         chipAll.setCardBackgroundColor(unselected)
         chipRunning.setCardBackgroundColor(unselected)
         chipWalking.setCardBackgroundColor(unselected)

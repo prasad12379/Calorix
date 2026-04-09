@@ -28,14 +28,24 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".WaterTrackerActivity"
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.Run" />
+        <activity
+            android:name=".Home_Fragment"
+            android:exported="false"
+            android:label="@string/title_activity_home_fragment"
+            android:theme="@style/Theme.Run" />
+        <activity
+            android:name=".water_tracker"
             android:exported="false"
             android:label="@string/title_activity_water_tracker"
             android:theme="@style/Theme.Run" />
         <activity
-            android:name=".MainActivity2"
+            android:name=".WaterTrackerActivity"
             android:exported="false"
-            android:label="@string/title_activity_main2"
+            android:label="@string/title_activity_water_tracker"
             android:theme="@style/Theme.Run" />
         <activity
             android:name=".ChatbotFragment"
@@ -62,16 +72,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
             android:name=".SignInActivity"
             android:exported="false" />
         <activity
             android:name=".SignupActivity"
-            android:exported="false" />
-        <activity
-            android:name=".water_tracker"
             android:exported="false" />
         <activity
             android:name=".Water_take"

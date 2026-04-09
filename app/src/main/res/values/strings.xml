@@ -14,4 +14,7 @@
     <string name="title_activity_af">AF</string>
     <string name="title_activity_main2">MainActivity2</string>
     <string name="title_activity_water_tracker">WaterTrackerActivity</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_home_fragment">Home_Fragment</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
