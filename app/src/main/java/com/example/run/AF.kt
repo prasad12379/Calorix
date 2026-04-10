@@ -34,37 +34,39 @@ import androidx.fragment.app.Fragment
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
-// ─── Color Palette (HD Gradient Schema) ────────────────────────────────────────
-private val BgDeep        = Color(0xFF1C2220)
-private val BgDark        = Color(0xFF272F2D)
-private val BgCard        = Color(0xFF2E3836)
-private val BgCardLight   = Color(0xFF364240)
-private val SiennaDeep    = Color(0xFF4A1C12)
-private val SiennaMid     = Color(0xFF6E2B1E)
-private val SiennaLight   = Color(0xFF9B4030)
-private val SiennaGlow    = Color(0xFFBF6050)
-private val SteelDeep     = Color(0xFF5A7A8A)
-private val SteelMid      = Color(0xFF8FAEC0)
-private val SteelLight    = Color(0xFFB0CCDA)
-private val VioletDeep    = Color(0xFF4A3D7A)
-private val VioletMid     = Color(0xFF7A6BA8)
-private val SubtleBorder  = Color(0xFF3D4D4A)
-private val TextPrimary   = Color(0xFFEEEEEC)
-private val TextMuted     = Color(0xFF8A9E9A)
+// ═══════════════════════════════════════════════════════════════════════════════
+//  CALORIX PALETTE  — replaces the old dark-green / sienna schema
+// ═══════════════════════════════════════════════════════════════════════════════
+private val BgWhite        = Color(0xFFFAF9FF)   // screen background
+private val BgLavender     = Color(0xFFECE8F5)   // card surface
+private val BgCard         = Color(0xFFFFFFFF)   // card fill
+private val BgCardLight    = Color(0xFFF5F3FC)   // card hover / alt surface
+private val DeepBlack      = Color(0xFF0A0A0A)   // header background
+private val HeaderDark     = Color(0xFF1C1826)   // header gradient end
+private val PureWhite      = Color(0xFFFFFFFF)
+private val AccentViolet   = Color(0xFF9B8FD4)   // primary accent
+private val AccentVioletDk = Color(0xFF6B5FA4)   // darker violet for gradients
+private val HoloPink       = Color(0xFFE8B4D8)   // secondary accent
+private val HoloMint       = Color(0xFFAEE8D8)   // tertiary accent
+private val SubtleGrey     = Color(0xFFDDD8EE)   // border / divider
+private val TextPrimary    = Color(0xFF0A0A0A)   // main text
+private val TextSecondary  = Color(0xFF7A7490)   // muted text
 
-// ─── Per-type gradient styling ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PER-TYPE GRADIENT  — maps workout modes to CaloriX gradients
+// ═══════════════════════════════════════════════════════════════════════════════
 private fun activityGradient(type: String): List<Color> = when (type.uppercase()) {
-    "RUNNING" -> listOf(SiennaDeep, SiennaMid, SiennaLight)
-    "WALKING" -> listOf(SteelDeep, SteelMid)
-    "CYCLING" -> listOf(VioletDeep, VioletMid)
-    else      -> listOf(SiennaDeep, SiennaMid)
+    "RUNNING" -> listOf(Color(0xFF2A1F4A), AccentViolet)          // deep violet → violet
+    "WALKING" -> listOf(Color(0xFF0F2A1A), Color(0xFF2E7D52))     // deep green → green
+    "CYCLING" -> listOf(Color(0xFF2A1A0F), Color(0xFF8B5E28))     // deep amber → amber
+    else      -> listOf(DeepBlack, AccentViolet)
 }
 
 private fun activityAccentColor(type: String): Color = when (type.uppercase()) {
-    "RUNNING" -> SiennaGlow
-    "WALKING" -> SteelLight
-    "CYCLING" -> Color(0xFF9B8FD4)
-    else      -> SiennaGlow
+    "RUNNING" -> AccentViolet
+    "WALKING" -> Color(0xFF2E7D52)
+    "CYCLING" -> Color(0xFF8B5E28)
+    else      -> AccentViolet
 }
 
 private fun activityIcon(type: String): ImageVector = when (type.uppercase()) {
@@ -83,6 +85,9 @@ private fun filterIcon(type: String): ImageVector = when (type) {
 
 private val filters = listOf("ALL", "RUNNING", "WALKING", "CYCLING")
 
+// ═══════════════════════════════════════════════════════════════════════════════
+//  FRAGMENT  — unchanged
+// ═══════════════════════════════════════════════════════════════════════════════
 class AF : Fragment() {
 
     private lateinit var apiInterface: ApiInterface
@@ -97,8 +102,8 @@ class AF : Fragment() {
             setContent {
                 MaterialTheme {
                     ActivityScreen(
-                        apiInterface = apiInterface,
-                        context      = requireContext(),
+                        apiInterface   = apiInterface,
+                        context        = requireContext(),
                         onStartWorkout = {
                             Toast.makeText(requireContext(), "Start workout from Home tab", Toast.LENGTH_SHORT).show()
                         }
@@ -117,13 +122,13 @@ class AF : Fragment() {
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 //  ROOT SCREEN
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun ActivityScreen(
-    apiInterface: ApiInterface,
-    context: Context,
+    apiInterface:   ApiInterface,
+    context:        Context,
     onStartWorkout: () -> Unit
 ) {
     var fullList      by remember { mutableStateOf<List<ActivityItem>>(emptyList()) }
@@ -162,45 +167,32 @@ fun ActivityScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(BgDeep, BgDark, Color(0xFF1F2826))
-                )
-            )
+            .background(BgWhite)   // ← BgWhite instead of dark gradient
     ) {
-        // Sienna blob — bottom left
+        // HoloPink blob — top right  (mirrors HomeFragment)
         Box(
             modifier = Modifier
                 .size(280.dp)
-                .align(Alignment.BottomStart)
-                .offset(x = (-60).dp, y = 60.dp)
-                .blur(90.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = 60.dp, y = (-60).dp)
+                .blur(80.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(
-                            SiennaMid.copy(alpha = 0.3f),
-                            SiennaDeep.copy(alpha = 0.1f),
-                            Color.Transparent
-                        ),
-                        radius = 450f
+                        listOf(HoloPink.copy(0.45f), HoloMint.copy(0.15f), Color.Transparent)
                     ),
                     CircleShape
                 )
         )
-        // Steel blob — top right
+        // AccentViolet blob — bottom left
         Box(
             modifier = Modifier
-                .size(240.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = 80.dp, y = (-40).dp)
-                .blur(80.dp)
+                .size(220.dp)
+                .align(Alignment.BottomStart)
+                .offset(x = (-50).dp, y = 60.dp)
+                .blur(70.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(
-                            SteelDeep.copy(alpha = 0.2f),
-                            Color.Transparent
-                        ),
-                        radius = 400f
+                        listOf(AccentViolet.copy(0.35f), Color.Transparent)
                     ),
                     CircleShape
                 )
@@ -208,17 +200,11 @@ fun ActivityScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             ActivityHeader(totalCount = fullList.size, isLoading = isLoading)
-
-            FilterChipsRow(
-                selected  = currentFilter,
-                onSelect  = { currentFilter = it }
-            )
-
+            FilterChipsRow(selected = currentFilter, onSelect = { currentFilter = it })
             Spacer(Modifier.height(8.dp))
-
             Box(modifier = Modifier.weight(1f)) {
                 when {
-                    isLoading -> LoadingState()
+                    isLoading          -> LoadingState()
                     displayList.isEmpty() -> EmptyActivityState(
                         filter         = currentFilter,
                         onStartWorkout = onStartWorkout
@@ -226,88 +212,115 @@ fun ActivityScreen(
                     else -> ActivityList(items = displayList)
                 }
             }
+            Spacer(Modifier.height(80.dp))
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  HEADER
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+//  HEADER  — dark banner matching HomeFragment's PremiumHeader
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun ActivityHeader(totalCount: Int, isLoading: Boolean) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .background(
+                Brush.verticalGradient(listOf(DeepBlack, HeaderDark))
+            )
+            .padding(horizontal = 24.dp, vertical = 28.dp)
     ) {
-        Text(
-            text          = "ACTIVITY",
-            fontSize      = 11.sp,
-            fontWeight    = FontWeight.SemiBold,
-            color         = TextMuted,
-            letterSpacing = 1.6.sp
+        // Corner glow — same as PremiumHeader
+        Box(
+            modifier = Modifier
+                .size(180.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = 60.dp, y = (-40).dp)
+                .blur(60.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(AccentViolet.copy(0.4f), HoloPink.copy(0.2f), Color.Transparent)
+                    ),
+                    CircleShape
+                )
         )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text          = "Your workouts.",
-            fontSize      = 30.sp,
-            fontWeight    = FontWeight.Bold,
-            color         = TextPrimary,
-            letterSpacing = (-0.8).sp
-        )
-        Spacer(Modifier.height(6.dp))
 
-        AnimatedContent(
-            targetState = isLoading,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "count"
-        ) { loading ->
-            if (loading) {
-                ShimmerLine(width = 120.dp, height = 14.dp)
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(6.dp)
-                            .background(
-                                Brush.radialGradient(colors = listOf(SteelLight, SteelMid)),
-                                CircleShape
+        Column {
+            // Eyebrow label
+            Text(
+                text          = "ACTIVITY",
+                fontSize      = 11.sp,
+                fontWeight    = FontWeight.SemiBold,
+                color         = TextSecondary.copy(0.7f),
+                letterSpacing = 1.6.sp
+            )
+            Spacer(Modifier.height(6.dp))
+            // Title
+            Text(
+                text          = "Your workouts.",
+                fontSize      = 28.sp,
+                fontWeight    = FontWeight.Bold,
+                color         = PureWhite,
+                letterSpacing = (-0.8).sp
+            )
+            Spacer(Modifier.height(4.dp))
+            // Gradient underbar — matches HomeFragment brand bar
+            Box(
+                Modifier
+                    .width(52.dp)
+                    .height(3.dp)
+                    .background(
+                        Brush.horizontalGradient(listOf(AccentViolet, HoloPink)),
+                        RoundedCornerShape(2.dp)
+                    )
+            )
+            Spacer(Modifier.height(10.dp))
+
+            AnimatedContent(
+                targetState  = isLoading,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label        = "count"
+            ) { loading ->
+                if (loading) {
+                    ShimmerLine(width = 120.dp, height = 14.dp)
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = PureWhite.copy(0.08f)
+                    ) {
+                        Row(
+                            modifier          = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(5.dp)
+                                    .background(HoloMint, CircleShape)
                             )
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text     = "$totalCount total workouts",
-                        fontSize = 13.sp,
-                        color    = TextMuted
-                    )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text     = "$totalCount total workouts",
+                                fontSize = 11.sp,
+                                color    = TextSecondary
+                            )
+                        }
+                    }
                 }
             }
         }
-
-        Spacer(Modifier.height(16.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(SiennaMid, SteelMid.copy(alpha = 0.5f), Color.Transparent)
-                    )
-                )
-        )
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 //  FILTER CHIPS ROW
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun FilterChipsRow(selected: String, onSelect: (String) -> Unit) {
     Row(
-        modifier            = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         filters.forEach { filter ->
@@ -315,7 +328,7 @@ fun FilterChipsRow(selected: String, onSelect: (String) -> Unit) {
                 label      = filter.lowercase().replaceFirstChar { it.uppercase() },
                 icon       = filterIcon(filter),
                 isSelected = selected == filter,
-                gradient   = if (filter == "ALL") listOf(SiennaDeep, SiennaMid)
+                gradient   = if (filter == "ALL") listOf(DeepBlack, AccentViolet)
                 else activityGradient(filter),
                 onClick    = { onSelect(filter) }
             )
@@ -325,16 +338,26 @@ fun FilterChipsRow(selected: String, onSelect: (String) -> Unit) {
 
 @Composable
 fun FilterChipItem(
-    label: String,
-    icon: ImageVector,
+    label:      String,
+    icon:       ImageVector,
     isSelected: Boolean,
-    gradient: List<Color>,
-    onClick: () -> Unit
+    gradient:   List<Color>,
+    onClick:    () -> Unit
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.04f else 1f,
+        targetValue   = if (isSelected) 1.04f else 1f,
         animationSpec = spring(stiffness = Spring.StiffnessLow),
-        label = "chipScale"
+        label         = "chipScale"
+    )
+    val bgColor    by animateColorAsState(
+        targetValue   = if (isSelected) Color.Transparent else SubtleGrey,
+        animationSpec = tween(250),
+        label         = "chipBg"
+    )
+    val textColor  by animateColorAsState(
+        targetValue   = if (isSelected) PureWhite else TextSecondary,
+        animationSpec = tween(250),
+        label         = "chipText"
     )
 
     Box(
@@ -342,62 +365,54 @@ fun FilterChipItem(
             .graphicsLayer { scaleX = scale; scaleY = scale }
             .clip(RoundedCornerShape(50))
             .background(
-                if (isSelected)
-                    Brush.linearGradient(colors = gradient)
-                else
-                    Brush.linearGradient(colors = listOf(BgCard, BgCardLight))
+                if (isSelected) Brush.linearGradient(gradient)
+                else            Brush.linearGradient(listOf(SubtleGrey, BgLavender))
             )
             .border(
                 width = 1.dp,
                 brush = if (isSelected)
-                    Brush.linearGradient(colors = listOf(gradient.last().copy(alpha = 0.6f), gradient.first()))
+                    Brush.linearGradient(listOf(gradient.last().copy(0.5f), gradient.first()))
                 else
-                    Brush.linearGradient(colors = listOf(SubtleBorder, Color.Transparent)),
+                    Brush.linearGradient(listOf(SubtleGrey, Color.Transparent)),
                 shape = RoundedCornerShape(50)
             )
             .clickable { onClick() }
     ) {
         Row(
-            modifier          = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier              = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Icon(
                 imageVector        = icon,
                 contentDescription = label,
-                tint               = if (isSelected) TextPrimary else TextMuted,
+                tint               = textColor,
                 modifier           = Modifier.size(15.dp)
             )
             Text(
                 text       = label,
                 fontSize   = 13.sp,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                color      = if (isSelected) TextPrimary else TextMuted
+                color      = textColor
             )
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  ACTIVITY LIST
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+//  ACTIVITY LIST  — unchanged
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun ActivityList(items: List<ActivityItem>) {
     val listState = rememberLazyListState()
-
     LazyColumn(
-        state           = listState,
-        modifier        = Modifier.fillMaxSize(),
-        contentPadding  = PaddingValues(
-            start  = 20.dp,
-            end    = 20.dp,
-            top    = 16.dp,
-            bottom = 32.dp
-        ),
+        state               = listState,
+        modifier            = Modifier.fillMaxSize(),
+        contentPadding      = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         itemsIndexed(items, key = { i, _ -> i }) { index, item ->
-            androidx.compose.animation.AnimatedVisibility(
+            AnimatedVisibility(
                 visible = true,
                 enter   = fadeIn(tween(300, delayMillis = (index * 60).coerceAtMost(300))) +
                         slideInVertically(
@@ -411,43 +426,36 @@ fun ActivityList(items: List<ActivityItem>) {
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+//  ACTIVITY CARD  — white card language matching HomeFragment cards
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun ActivityCard(item: ActivityItem) {
-    val gradient     = activityGradient(item.workout_mode)
-    val accentColor  = activityAccentColor(item.workout_mode)
-    val icon         = activityIcon(item.workout_mode)
+    val gradient    = activityGradient(item.workout_mode)
+    val accentColor = activityAccentColor(item.workout_mode)
+    val icon        = activityIcon(item.workout_mode)
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.linearGradient(colors = listOf(BgCard, BgCardLight))
-            )
-            .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
-                    colors = listOf(SubtleBorder, gradient.first().copy(alpha = 0.2f))
-                ),
-                shape = RoundedCornerShape(20.dp)
-            )
+    Surface(
+        modifier        = Modifier.fillMaxWidth(),
+        shape           = RoundedCornerShape(20.dp),
+        color           = BgCard,
+        shadowElevation = 6.dp,
+        border          = BorderStroke(1.dp, SubtleGrey)
     ) {
         Row(
             modifier          = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon bubble with activity gradient
+            // Icon bubble with workout gradient
             Box(
                 modifier = Modifier
                     .size(52.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(
-                        Brush.linearGradient(colors = gradient)
-                    )
+                    .background(Brush.linearGradient(gradient))
                     .border(
                         width = 1.dp,
                         brush = Brush.linearGradient(
-                            colors = listOf(accentColor.copy(alpha = 0.4f), gradient.first())
+                            listOf(accentColor.copy(0.4f), gradient.first())
                         ),
                         shape = RoundedCornerShape(16.dp)
                     ),
@@ -456,7 +464,7 @@ fun ActivityCard(item: ActivityItem) {
                 Icon(
                     imageVector        = icon,
                     contentDescription = item.workout_mode,
-                    tint               = TextPrimary,
+                    tint               = PureWhite,
                     modifier           = Modifier.size(26.dp)
                 )
             }
@@ -465,8 +473,7 @@ fun ActivityCard(item: ActivityItem) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text       = item.workout_mode.lowercase()
-                        .replaceFirstChar { it.uppercase() },
+                    text       = item.workout_mode.lowercase().replaceFirstChar { it.uppercase() },
                     fontSize   = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color      = TextPrimary
@@ -475,33 +482,38 @@ fun ActivityCard(item: ActivityItem) {
                 Text(
                     text     = formatActivityDate(item.date ?: ""),
                     fontSize = 12.sp,
-                    color    = TextMuted
+                    color    = TextSecondary
                 )
             }
 
             Column(horizontalAlignment = Alignment.End) {
-                StatPill(value = "${item.distance} km", gradient = gradient)
+                StatPill(value = "${item.distance} km",  gradient = gradient)
                 Spacer(Modifier.height(5.dp))
-                StatPill(value = "${item.duration} min", gradient = listOf(BgCardLight, BgCardLight))
+                StatPill(value = "${item.duration} min", gradient = listOf(BgLavender, BgLavender))
             }
         }
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+//  STAT PILL
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun StatPill(value: String, gradient: List<Color>) {
+    val isNeutral = gradient.first() == gradient.last() || gradient.first() == BgLavender
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(
-                Brush.linearGradient(
-                    colors = gradient.map { it.copy(alpha = 0.25f) }
-                )
+                Brush.linearGradient(gradient.map { it.copy(alpha = if (isNeutral) 1f else 0.15f) })
             )
             .border(
                 width = 1.dp,
                 brush = Brush.linearGradient(
-                    colors = listOf(gradient.last().copy(alpha = 0.3f), Color.Transparent)
+                    listOf(
+                        if (isNeutral) SubtleGrey else gradient.last().copy(0.4f),
+                        Color.Transparent
+                    )
                 ),
                 shape = RoundedCornerShape(50)
             )
@@ -511,29 +523,24 @@ fun StatPill(value: String, gradient: List<Color>) {
             text       = value,
             fontSize   = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = if (gradient.size == 1 || gradient.first() == gradient.last()) TextMuted
-            else gradient.last().copy(alpha = 1f).let {
-                // lighten for readability on dark bg
-                Color(
-                    red   = (it.red * 1.3f).coerceAtMost(1f),
-                    green = (it.green * 1.3f).coerceAtMost(1f),
-                    blue  = (it.blue * 1.3f).coerceAtMost(1f),
-                    alpha = 1f
-                )
-            }
+            color      = if (isNeutral) TextSecondary
+            else Color(
+                red   = (gradient.last().red   * 1.2f).coerceAtMost(1f),
+                green = (gradient.last().green * 1.2f).coerceAtMost(1f),
+                blue  = (gradient.last().blue  * 1.2f).coerceAtMost(1f),
+                alpha = 1f
+            )
         )
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 //  EMPTY STATE
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun EmptyActivityState(filter: String, onStartWorkout: () -> Unit) {
     Column(
-        modifier            = Modifier
-            .fillMaxSize()
-            .padding(40.dp),
+        modifier            = Modifier.fillMaxSize().padding(40.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -541,17 +548,10 @@ fun EmptyActivityState(filter: String, onStartWorkout: () -> Unit) {
             modifier = Modifier
                 .size(90.dp)
                 .clip(CircleShape)
-                .background(
-                    Brush.linearGradient(
-                        colors = if (filter == "ALL") listOf(SiennaDeep, SiennaMid)
-                        else activityGradient(filter)
-                    )
-                )
+                .background(BgLavender)
                 .border(
-                    width = 2.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(SiennaGlow.copy(alpha = 0.4f), Color.Transparent)
-                    ),
+                    width = 1.dp,
+                    brush = Brush.linearGradient(listOf(AccentViolet.copy(0.4f), HoloPink.copy(0.2f))),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -560,7 +560,7 @@ fun EmptyActivityState(filter: String, onStartWorkout: () -> Unit) {
                 imageVector        = if (filter == "ALL") Icons.Filled.FitnessCenter
                 else activityIcon(filter),
                 contentDescription = null,
-                tint               = TextPrimary,
+                tint               = AccentViolet,
                 modifier           = Modifier.size(40.dp)
             )
         }
@@ -573,14 +573,15 @@ fun EmptyActivityState(filter: String, onStartWorkout: () -> Unit) {
             fontSize   = 20.sp,
             fontWeight = FontWeight.Bold,
             color      = TextPrimary,
-            textAlign  = TextAlign.Center
+            textAlign  = TextAlign.Center,
+            letterSpacing = (-0.4).sp
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text       = if (filter == "ALL") "Start your first workout\nand track your progress here."
             else "Try a different filter\nor log your first session.",
             fontSize   = 14.sp,
-            color      = TextMuted,
+            color      = TextSecondary,
             textAlign  = TextAlign.Center,
             lineHeight = 21.sp
         )
@@ -589,40 +590,48 @@ fun EmptyActivityState(filter: String, onStartWorkout: () -> Unit) {
             Spacer(Modifier.height(32.dp))
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(
-                        Brush.linearGradient(
-                            colors = listOf(SiennaDeep, SiennaMid, SiennaLight)
-                        )
+                        Brush.linearGradient(listOf(DeepBlack, HeaderDark))
                     )
                     .border(
                         width = 1.dp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(SiennaGlow.copy(alpha = 0.5f), SiennaDeep)
-                        ),
-                        shape = RoundedCornerShape(50)
+                        brush = Brush.linearGradient(listOf(SubtleGrey.copy(0.3f), Color.Transparent)),
+                        shape = RoundedCornerShape(16.dp)
                     )
                     .clickable { onStartWorkout() }
-                    .padding(horizontal = 32.dp, vertical = 14.dp)
+                    .padding(horizontal = 28.dp, vertical = 14.dp)
             ) {
-                Text(
-                    text       = "Start First Workout →",
-                    fontSize   = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color      = TextPrimary
-                )
+                Row(
+                    verticalAlignment     = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.DirectionsRun,
+                        contentDescription = null,
+                        tint     = PureWhite,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text       = "Start First Workout →",
+                        fontSize   = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color      = PureWhite,
+                        letterSpacing = 0.3.sp
+                    )
+                }
             }
         }
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  LOADING STATE
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+//  LOADING STATE  — shimmer cards on white background
+// ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 fun LoadingState() {
     Column(
-        modifier        = Modifier
+        modifier            = Modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -635,23 +644,17 @@ fun LoadingState() {
 fun ShimmerActivityCard() {
     val shimmer = rememberInfiniteTransition(label = "shimmer")
     val alpha by shimmer.animateFloat(
-        initialValue  = 0.15f,
-        targetValue   = 0.4f,
+        initialValue  = 0.4f,
+        targetValue   = 0.9f,
         animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
         label         = "alpha"
     )
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.linearGradient(colors = listOf(BgCard, BgCardLight))
-            )
-            .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(colors = listOf(SubtleBorder, Color.Transparent)),
-                shape = RoundedCornerShape(20.dp)
-            )
+    Surface(
+        modifier        = Modifier.fillMaxWidth(),
+        shape           = RoundedCornerShape(20.dp),
+        color           = BgCard,
+        shadowElevation = 3.dp,
+        border          = BorderStroke(1.dp, SubtleGrey)
     ) {
         Row(
             modifier          = Modifier.padding(16.dp),
@@ -661,13 +664,13 @@ fun ShimmerActivityCard() {
                 modifier = Modifier
                     .size(52.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(SubtleBorder.copy(alpha = alpha))
+                    .background(SubtleGrey.copy(alpha = alpha))
             )
             Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 ShimmerLine(width = 110.dp, height = 15.dp, alpha = alpha)
                 Spacer(Modifier.height(8.dp))
-                ShimmerLine(width = 80.dp, height = 12.dp, alpha = alpha)
+                ShimmerLine(width = 80.dp,  height = 12.dp, alpha = alpha)
             }
             Column(horizontalAlignment = Alignment.End) {
                 ShimmerLine(width = 55.dp, height = 22.dp, alpha = alpha)
@@ -680,25 +683,28 @@ fun ShimmerActivityCard() {
 
 @Composable
 fun ShimmerLine(
-    width: androidx.compose.ui.unit.Dp,
+    width:  androidx.compose.ui.unit.Dp,
     height: androidx.compose.ui.unit.Dp,
-    alpha: Float = 0.3f
+    alpha:  Float = 0.5f
 ) {
     Box(
         modifier = Modifier
             .width(width)
             .height(height)
             .clip(RoundedCornerShape(6.dp))
-            .background(SubtleBorder.copy(alpha = alpha))
+            .background(SubtleGrey.copy(alpha = alpha))
     )
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+//  DATE FORMATTER  — unchanged
+// ═══════════════════════════════════════════════════════════════════════════════
 private fun formatActivityDate(dateStr: String): String {
     return try {
         val input  = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
-        val output = java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault())
+        val output = java.text.SimpleDateFormat("dd MMM yyyy",           java.util.Locale.getDefault())
         output.format(input.parse(dateStr)!!)
-    } catch (e: Exception) { dateStr.take(10).ifEmpty { "—" } }
+    } catch (e: Exception) {
+        dateStr.take(10).ifEmpty { "—" }
+    }
 }
-
-

@@ -245,7 +245,7 @@ fun ProfileScreen(apiInterface: ApiInterface, context: Context,
                     labelColor = DangerRed, showChevron = false, onClick = onLogout)
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(120.dp))
         }
     }
 }

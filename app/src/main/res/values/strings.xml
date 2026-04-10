@@ -17,4 +17,6 @@
     <string name="title_activity_home_screen">HomeScreen</string>
     <string name="title_activity_home_fragment">Home_Fragment</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_fragment">ActivityFragment</string>
 </resources>

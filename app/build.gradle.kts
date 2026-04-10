@@ -85,7 +85,8 @@ dependencies {
     implementation("androidx.compose.animation:animation:1.7.5")
     implementation(libs.androidx.compose.ui.geometry)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.compose.foundation)        // ← fixed: 1.x.x → 1.7.5
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.material3)        // ← fixed: 1.x.x → 1.7.5
 
     // ── Testing ──────────────────────────────────────────────────────────
     testImplementation(libs.junit)

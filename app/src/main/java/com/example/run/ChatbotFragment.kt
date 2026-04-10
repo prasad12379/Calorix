@@ -165,6 +165,7 @@ fun MiliChatScreen(apiInterface: ApiInterface) {
                 }
             }
             MiliInputBar(inputText, { inputText = it }) { sendMessage(inputText) }
+            Spacer(Modifier.height(80.dp))
         }
     }
 }
