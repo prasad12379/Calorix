@@ -16,12 +16,12 @@ interface ApiInterface {
     ): Call<MyData>
 
     // ✅ Signup API (NEW)
-    @POST("signup")
+    @POST("auth/signup")
     fun signupUser(
         @Body signupRequest: UserSignupRequest
     ): Call<SignupResponse>
 
-    @POST("signin")
+    @POST("auth/signin")
     fun signinUser(
         @Body signinRequest: SigninRequest
     ): Call<SigninResponse>
@@ -40,8 +40,5 @@ interface ApiInterface {
     fun getActivities(
         @Path("email") email: String
     ): Call<ActivityListResponse>
-
-
-
 
 }

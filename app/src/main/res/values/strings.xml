@@ -19,4 +19,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_fragment">ActivityFragment</string>
+    <string name="title_activity_sign_in">SignIn</string>
+    <string name="title_activity_sign_up">SignUp</string>
+    <string name="title_activity_workout_summary">workout_summary</string>
 </resources>

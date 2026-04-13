@@ -259,7 +259,7 @@ class WorkoutActivity : ComponentActivity() {
     }
 
     private fun launchSummary(imagePath: String) {
-        val intent = Intent(this, WorkoutSummaryActivity::class.java).apply {
+        val intent = Intent(this, workout_summary::class.java).apply {
             putExtra("WORKOUT_MODE",   workoutMode)
             putExtra("DURATION",       formatTime(seconds))
             putExtra("DISTANCE",       String.format("%.2f", distanceKm))

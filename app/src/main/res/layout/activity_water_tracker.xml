@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
     android:fillViewport="true"
     android:scrollbars="none">
 
@@ -30,10 +29,8 @@
                 android:id="@+id/btnBack"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
-                android:src="@drawable/ic_arrow_back"
                 android:padding="9dp"
                 app:tint="#FFFFFF"
-                android:background="@drawable/neon_icon_bg"
                 android:elevation="4dp"/>
 
             <TextView
@@ -51,10 +48,8 @@
             <ImageView
                 android:layout_width="42dp"
                 android:layout_height="42dp"
-                android:src="@drawable/ic_water_drop"
                 android:padding="9dp"
                 app:tint="#2ACFD9"
-                android:background="@drawable/neon_icon_bg_cyan"
                 android:elevation="4dp"/>
         </LinearLayout>
 
@@ -72,7 +67,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/neon_card_cyan"
                 android:orientation="vertical"
                 android:padding="24dp">
 
@@ -88,11 +82,10 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:gravity="center"
-                        android:background="@drawable/neon_dot_cyan">
+                        >
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_target"
                             app:tint="#2ACFD9"/>
                     </LinearLayout>
 
@@ -111,7 +104,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="28dp"
-                        android:background="@drawable/badge_cyan"
+
                         android:gravity="center"
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp">
@@ -178,25 +171,25 @@
                     android:layout_marginBottom="20dp">
 
                     <ImageView android:layout_width="14dp" android:layout_height="14dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#302ACFD9"
+                         app:tint="#302ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="18dp" android:layout_height="18dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#502ACFD9"
+                         app:tint="#502ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="22dp" android:layout_height="22dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#702ACFD9"
+                         app:tint="#702ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="26dp" android:layout_height="26dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#CC2ACFD9"
+                         app:tint="#CC2ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="22dp" android:layout_height="22dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#702ACFD9"
+                         app:tint="#702ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="18dp" android:layout_height="18dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#502ACFD9"
+                        app:tint="#502ACFD9"
                         android:layout_marginEnd="6dp"/>
                     <ImageView android:layout_width="14dp" android:layout_height="14dp"
-                        android:src="@drawable/ic_water_drop" app:tint="#302ACFD9"/>
+                         app:tint="#302ACFD9"/>
                 </LinearLayout>
 
                 <!-- Slider -->
@@ -251,7 +244,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/neon_card_amber"
                 android:orientation="vertical"
                 android:padding="24dp">
 
@@ -267,11 +259,11 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:gravity="center"
-                        android:background="@drawable/neon_dot_amber">
+                        >
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/ic_time"
+
                             app:tint="#FFC107"/>
                     </LinearLayout>
 
@@ -289,7 +281,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="28dp"
-                        android:background="@drawable/badge_amber"
+
                         android:gravity="center"
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp">
@@ -352,7 +344,7 @@
                                 android:layout_width="10dp"
                                 android:layout_height="10dp"
                                 android:layout_gravity="center"
-                                android:background="@drawable/circle_shape"
+
                                 android:backgroundTint="#FFC107"
                                 android:elevation="4dp"/>
 
@@ -361,7 +353,7 @@
                                 android:layout_width="72dp"
                                 android:layout_height="3dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/clock_hand"
+
                                 android:rotation="0"
                                 app:tint="#FFC107"
                                 android:elevation="3dp"/>
@@ -476,7 +468,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/neon_card_green"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="18dp">
@@ -493,7 +484,6 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/pulse_ring_green"
                         android:alpha="0.4"/>
 
                     <!-- Inner solid dot -->
@@ -501,7 +491,7 @@
                         android:layout_width="14dp"
                         android:layout_height="14dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/circle_shape"
+
                         android:backgroundTint="#4CAF50"/>
                 </FrameLayout>
 
@@ -533,7 +523,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="26dp"
-                    android:background="@drawable/badge_green"
+
                     android:gravity="center"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp">
@@ -556,7 +546,6 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="68dp"
-            android:background="@drawable/neon_button_glow"
             android:elevation="12dp"
             android:padding="6dp"
             android:layout_marginBottom="14dp">
@@ -581,7 +570,7 @@
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
-                        android:src="@drawable/ic_water_drop"
+
                         app:tint="#2ACFD9"
                         android:layout_marginEnd="12dp"/>
 
@@ -603,7 +592,7 @@
                         android:text="250 ml"
                         android:textSize="13sp"
                         android:textColor="#992ACFD9"
-                        android:background="@drawable/badge_cyan_small"
+
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:paddingTop="4dp"
@@ -619,7 +608,6 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="68dp"
-            android:background="@drawable/neon_button_glow_red"
             android:elevation="12dp"
             android:padding="6dp">
 
@@ -649,12 +637,12 @@
                             android:layout_width="14dp"
                             android:layout_height="14dp"
                             android:layout_gravity="center"
-                            android:background="@drawable/circle_shape"
+
                             android:backgroundTint="#FF5252"/>
                         <View
                             android:layout_width="26dp"
                             android:layout_height="26dp"
-                            android:background="@drawable/circle_shape"
+
                             android:backgroundTint="#1AFF5252"/>
                     </FrameLayout>
 
@@ -673,7 +661,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/badge_red_small"
+
                         android:gravity="center"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"

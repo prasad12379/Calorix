@@ -65,7 +65,7 @@ class SplashActivity : AppCompatActivity() {
         val intent = if (isLoggedIn) {
             Intent(this, MainActivity::class.java)
         } else {
-            Intent(this, SignInActivity::class.java)
+            Intent(this, SignIn::class.java)
         }
 
         startActivity(intent)

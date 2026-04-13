@@ -63,7 +63,7 @@ class ReminderWorker(
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID_FG)
-            .setSmallIcon(R.drawable.ic_water_drop)
+
             .setContentTitle("💧 Water reminder active")
             .setContentText("Tap to open water tracker")
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -105,7 +105,7 @@ class ReminderWorker(
         val goalL         = goalMl / 1000.0
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_water_drop)
+
             .setContentTitle("💧 Time to Drink Water!")
             .setContentText("Daily goal: ${String.format("%.1f", goalL)}L · Every $intervalLabel")
             .setStyle(

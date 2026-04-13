@@ -13,7 +13,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/glass_card_background"
         android:orientation="vertical"
         android:padding="18dp">
 
@@ -45,7 +44,6 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_running"
                         app:tint="#FFFFFF"/>
                 </androidx.cardview.widget.CardView>
 
@@ -97,7 +95,6 @@
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:src="@drawable/ic_time"
                         app:tint="#FFFFFF"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="6dp"/>
@@ -134,7 +131,6 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_distance"
                     app:tint="#64B5F6"
                     android:layout_marginBottom="6dp"/>
 
@@ -167,7 +163,6 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_pace"
                     app:tint="#AB47BC"
                     android:layout_marginBottom="6dp"/>
 
@@ -200,7 +195,6 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_calories"
                     app:tint="#FF7043"
                     android:layout_marginBottom="6dp"/>
 
@@ -251,7 +245,6 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_speed"
                         app:tint="#FFC107"
                         android:layout_marginEnd="8dp"/>
 
@@ -300,7 +293,6 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_steps"
                         app:tint="#00BCD4"
                         android:layout_marginEnd="8dp"/>
 
@@ -360,7 +352,7 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_share"
+
                         app:tint="#FFFFFF"/>
 
                     <TextView
