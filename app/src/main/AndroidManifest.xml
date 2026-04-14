@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions (no duplicates) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -14,12 +15,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
 
     <application
         android:allowBackup="true"
@@ -28,113 +23,60 @@
         android:theme="@style/Theme.Run"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".workout_summary"
-            android:exported="false"
-            android:label="@string/title_activity_workout_summary"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".SignUp"
-            android:exported="false"
-            android:label="@string/title_activity_sign_up"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".SignIn"
-            android:exported="false"
-            android:label="@string/title_activity_sign_in"
-            android:theme="@style/Theme.Run" /> <!-- ✅ LAUNCHER — must be exported="true" -->
+
+        <!-- Launcher -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Run">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".SignIn"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".SignUp"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".CountActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".WorkoutActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
+
+        <activity android:name=".MainActivity" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".SignIn" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".SignUp" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".CountActivity" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".WorkoutActivity" android:exported="false" android:theme="@style/Theme.Run" />
         <activity
             android:name=".workout_summary"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".water_tracker"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".water_tracker"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
+        <activity android:name=".water_tracker" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".Stress_Game" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".bhagwat_gita" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".NotificationsActivity" android:exported="false" android:theme="@style/Theme.Run" />
+        <activity android:name=".AboutActivity" android:exported="false" android:theme="@style/Theme.Run" />
+
+        <!-- ChatbotActivity (NOT ChatbotFragment) -->
+        <activity android:name=".ChatbotFragment" android:exported="false" android:theme="@style/Theme.Run" />
 
         <activity
-            android:name=".Stress_Game"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".bhagwat_gita"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".NotificationsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Run" />
-        <activity
-            android:name=".AboutActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Run" /> <!-- ✅ ChatbotActivity — wraps ChatbotFragment as a standalone screen -->
-        <activity
-            android:name=".ChatbotFragment"
-            android:exported="false"
-            android:theme="@style/Theme.Run" /> <!-- WorkManager foreground service -->
-
-        <activity android:name=".WaterDrinkActivity"
+            android:name=".WaterDrinkActivity"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:launchMode="singleTask"
-            android:exported="true"/>
+            android:exported="true" />
+
+        <!-- WorkManager foreground service -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            tools:node="merge" /> <!-- BootReceiver -->
+            tools:node="merge" />
+
+        <!-- Water reminder + boot receiver -->
         <receiver
-            android:name=".BootReceiver"
-            android:enabled="true"
+            android:name=".WaterReminderReceiver"
             android:exported="true">
             <intent-filter>
+                <action android:name="com.example.run.ACTION_LOG_DRINK" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".WaterReminderReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.example.run.ACTION_LOG_DRINK"/>
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
