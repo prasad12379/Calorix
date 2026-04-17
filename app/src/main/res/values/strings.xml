@@ -22,4 +22,5 @@
     <string name="title_activity_sign_in">SignIn</string>
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_workout_summary">workout_summary</string>
+    <string name="title_activity_partner_workout">PartnerWorkout</string>
 </resources>

@@ -30,7 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -58,35 +63,44 @@ import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.min
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //  MAP STYLE
 // ═══════════════════════════════════════════════════════════════════════════════
-private const val MAP_STYLE_URL  = "https://api.maptiler.com/maps/streets-v4/style.json?key=oGsc8v2qhePidbWmiKVt"
+private const val MAP_STYLE_URL   = "https://api.maptiler.com/maps/streets-v4/style.json?key=oGsc8v2qhePidbWmiKVt"
 private const val ROUTE_SOURCE_ID = "route-source"
 private const val ROUTE_LAYER_ID  = "route-layer"
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  CALORIX PALETTE
+//  CALORIX PALETTE — unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 private val BgDeep       = Color(0xFF0A0A0A)
 private val HeaderDark   = Color(0xFF1C1826)
-private val CardBg       = Color(0xDD0A0A0A)   // dark translucent card
+private val CardBg       = Color(0xDD0A0A0A)
 private val PureWhite    = Color(0xFFFFFFFF)
 private val AccentViolet = Color(0xFF9B8FD4)
 private val HoloPink     = Color(0xFFE8B4D8)
 private val HoloMint     = Color(0xFFAEE8D8)
 private val SubtleGrey   = Color(0xFFDDD8EE)
-private val TextPrimary  = Color(0xFFF5F3FF)    // near-white for dark overlay
-private val TextMuted    = Color(0xFF9E96C0)    // muted violet-grey
+private val TextPrimary  = Color(0xFFF5F3FF)
+private val TextMuted    = Color(0xFF9E96C0)
 private val ErrorRed     = Color(0xFFE8574A)
 private val GlassBorder  = Color(0x33FFFFFF)
 private val GlassWhite   = Color(0x18FFFFFF)
 
+// ── Flame ring colours ────────────────────────────────────────────────────────
+private val FlameOrange  = Color(0xFFFF6B35)
+private val FlameYellow  = Color(0xFFFFD166)
+private val FlameViolet  = Color(0xFF9B8FD4)
+
 private val modeIcon get() = mapOf("RUNNING" to "🏃", "WALKING" to "🚶", "CYCLING" to "🚴")
 
+// ── Calorie milestone every 100 kcal ─────────────────────────────────────────
+private const val CALORIE_MILESTONE = 100.0
+
 // ═══════════════════════════════════════════════════════════════════════════════
-//  ACTIVITY  — ALL backend logic 100% unchanged
+//  ACTIVITY — backend logic 100% unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 class WorkoutActivity : ComponentActivity() {
 
@@ -137,8 +151,7 @@ class WorkoutActivity : ComponentActivity() {
         if (checkLocationPermission()) startWorkout() else requestLocationPermission()
     }
 
-    // ── All workout logic unchanged ───────────────────────────────────────
-    private fun startWorkout() { startTimer(); initializeFirstLocation(); startLocationTracking() }
+    private fun startWorkout()  { startTimer(); initializeFirstLocation(); startLocationTracking() }
 
     private fun startTimer() {
         timerRunnable = object : Runnable {
@@ -207,7 +220,6 @@ class WorkoutActivity : ComponentActivity() {
                 existing.setGeoJson(collection)
             } else {
                 style.addSource(GeoJsonSource(ROUTE_SOURCE_ID, collection))
-                // ✅ Route line color updated to AccentViolet hex
                 style.addLayer(
                     LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID).withProperties(
                         lineColor("#9B8FD4"),
@@ -282,7 +294,9 @@ class WorkoutActivity : ComponentActivity() {
         ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
     private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -317,7 +331,7 @@ private fun formatTime(s: Int): String {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  WORKOUT SCREEN
+//  WORKOUT SCREEN — unchanged structure
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun WorkoutScreen(
@@ -344,7 +358,6 @@ private fun WorkoutScreen(
 
     Box(modifier = Modifier.fillMaxSize().background(BgDeep)) {
 
-        // ── MAP ──────────────────────────────────────────────────────────
         AndroidView(
             factory = { ctx ->
                 MapView(ctx).apply {
@@ -373,37 +386,20 @@ private fun WorkoutScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // ── Gradient overlays — dark fade top + bottom ────────────────────
-        Box(
-            Modifier.fillMaxWidth().height(300.dp)
-                .background(Brush.verticalGradient(listOf(BgDeep, Color.Transparent)))
-        )
-        Box(
-            Modifier.fillMaxWidth().height(220.dp).align(Alignment.BottomCenter)
-                .background(Brush.verticalGradient(listOf(Color.Transparent, BgDeep)))
-        )
+        Box(Modifier.fillMaxWidth().height(300.dp)
+            .background(Brush.verticalGradient(listOf(BgDeep, Color.Transparent))))
+        Box(Modifier.fillMaxWidth().height(220.dp).align(Alignment.BottomCenter)
+            .background(Brush.verticalGradient(listOf(Color.Transparent, BgDeep))))
 
-        // ── Holographic blobs on top overlay ─────────────────────────────
-        Box(
-            Modifier.size(200.dp).align(Alignment.TopEnd)
-                .offset(x = (40 + drift * 6).dp, y = (-30 + drift * 8).dp)
-                .blur(60.dp)
-                .background(
-                    Brush.radialGradient(listOf(HoloPink.copy(0.25f), Color.Transparent)),
-                    CircleShape
-                )
-        )
-        Box(
-            Modifier.size(160.dp).align(Alignment.TopStart)
-                .offset(x = (-30).dp, y = (50 - drift * 6).dp)
-                .blur(50.dp)
-                .background(
-                    Brush.radialGradient(listOf(AccentViolet.copy(0.2f), Color.Transparent)),
-                    CircleShape
-                )
-        )
+        Box(Modifier.size(200.dp).align(Alignment.TopEnd)
+            .offset(x = (40 + drift * 6).dp, y = (-30 + drift * 8).dp)
+            .blur(60.dp)
+            .background(Brush.radialGradient(listOf(HoloPink.copy(0.25f), Color.Transparent)), CircleShape))
+        Box(Modifier.size(160.dp).align(Alignment.TopStart)
+            .offset(x = (-30).dp, y = (50 - drift * 6).dp)
+            .blur(50.dp)
+            .background(Brush.radialGradient(listOf(AccentViolet.copy(0.2f), Color.Transparent)), CircleShape))
 
-        // ── TOP STATS ─────────────────────────────────────────────────────
         AnimatedVisibility(
             visible = visible,
             enter   = fadeIn(tween(500)) + slideInVertically(tween(500)) { -80 }
@@ -418,7 +414,6 @@ private fun WorkoutScreen(
             )
         }
 
-        // ── BOTTOM CONTROLS ───────────────────────────────────────────────
         AnimatedVisibility(
             visible  = visible,
             enter    = fadeIn(tween(500)) + slideInVertically(tween(500)) { 80 },
@@ -427,7 +422,6 @@ private fun WorkoutScreen(
             BottomControls(isPaused = isPaused, onPause = onPause, onStop = onStop)
         }
 
-        // ── CENTER FAB ────────────────────────────────────────────────────
         AnimatedVisibility(
             visible  = visible,
             enter    = fadeIn(tween(600)) + scaleIn(tween(600)),
@@ -439,7 +433,183 @@ private fun WorkoutScreen(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  TOP STATS BOX
+//  ★ NEW: CALORIE FLAME RING
+//
+//  Draws behind the timer inside the stats card.
+//  - Arc fills from -150° sweeping up to 300° total (bottom-left → bottom-right)
+//  - Color sweeps orange → yellow → violet as calories increase
+//  - Track ring (empty) always shown at low opacity
+//  - Milestone pulse: at every 100 kcal, ring pulses + haptic + floating badge
+// ═══════════════════════════════════════════════════════════════════════════════
+@Composable
+private fun CalorieFlameRing(
+    calories:    Double,
+    milestoneKcal: Int = 100,          // pulse every N kcal
+    ringSize:    androidx.compose.ui.unit.Dp = 200.dp,
+    strokeWidth: androidx.compose.ui.unit.Dp = 10.dp,
+    content:     @Composable BoxScope.() -> Unit
+) {
+    val haptic = LocalHapticFeedback.current
+    val scope  = rememberCoroutineScope()
+
+    // Progress fraction within the current 100-kcal segment (0→1)
+    val segmentProgress = ((calories % milestoneKcal) / milestoneKcal).toFloat()
+    val animProgress by animateFloatAsState(
+        targetValue   = segmentProgress,
+        animationSpec = tween(800, easing = FastOutSlowInEasing),
+        label         = "flame_progress"
+    )
+
+    // Milestone detection — fires haptic + badge on every new 100-kcal crossed
+    var lastMilestone by remember { mutableIntStateOf(0) }
+    var showBadge     by remember { mutableStateOf(false) }
+    var badgeAlpha    by remember { mutableFloatStateOf(0f) }
+    var badgeOffsetY  by remember { mutableFloatStateOf(0f) }
+    var milestoneScale by remember { mutableFloatStateOf(1f) }
+
+    val currentMilestone = (calories / milestoneKcal).toInt() * milestoneKcal
+    LaunchedEffect(currentMilestone) {
+        if (currentMilestone > lastMilestone && currentMilestone > 0) {
+            lastMilestone = currentMilestone
+            // Haptic burst
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            scope.launch { delay(120); haptic.performHapticFeedback(HapticFeedbackType.LongPress) }
+            // Ring pulse
+            milestoneScale = 1.08f
+            scope.launch { delay(350); milestoneScale = 1f }
+            // Floating badge
+            showBadge   = true
+            badgeAlpha  = 1f
+            badgeOffsetY = 0f
+            scope.launch {
+                repeat(30) {
+                    delay(30)
+                    badgeOffsetY -= 3f
+                    badgeAlpha   = maxOf(0f, badgeAlpha - 0.033f)
+                }
+                showBadge = false
+                badgeAlpha  = 0f
+                badgeOffsetY = 0f
+            }
+        }
+    }
+
+    val animScale by animateFloatAsState(
+        targetValue   = milestoneScale,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label         = "ring_scale"
+    )
+
+    // Spinning shimmer on the arc tip — single InfiniteTransition
+    val inf = rememberInfiniteTransition(label = "flame_ring")
+    val shimmerAlpha by inf.animateFloat(
+        0.4f, 1f,
+        infiniteRepeatable(tween(900), RepeatMode.Reverse),
+        label = "shimmer"
+    )
+
+    Box(
+        modifier          = Modifier.size(ringSize),
+        contentAlignment  = Alignment.Center
+    ) {
+        // Canvas ring
+        androidx.compose.foundation.Canvas(
+            Modifier
+                .fillMaxSize()
+                .scale(animScale)
+        ) {
+            val stroke     = strokeWidth.toPx()
+            val padding    = stroke / 2f + 4.dp.toPx()
+            val diameter   = size.minDimension - padding * 2
+            val topLeft    = Offset(padding, padding)
+            val arcSize    = Size(diameter, diameter)
+            val startAngle = 150f        // bottom-left
+            val sweepTotal = 240f        // leaves a gap at the bottom
+
+            // ── Track (empty ring) ────────────────────────────────────────
+            drawArc(
+                color      = FlameOrange.copy(alpha = 0.12f),
+                startAngle = startAngle,
+                sweepAngle = sweepTotal,
+                useCenter  = false,
+                topLeft    = topLeft,
+                size       = arcSize,
+                style      = Stroke(stroke, cap = StrokeCap.Round)
+            )
+
+            // ── Filled flame arc ──────────────────────────────────────────
+            val fillSweep = sweepTotal * animProgress
+            if (fillSweep > 0f) {
+                // Color: orange at 0% → yellow at 50% → violet at 100%
+                val flameBrush = Brush.sweepGradient(
+                    0f   to FlameOrange,
+                    0.3f to FlameYellow,
+                    0.6f to FlameViolet,
+                    1f   to FlameOrange
+                )
+                drawArc(
+                    brush      = flameBrush,
+                    startAngle = startAngle,
+                    sweepAngle = fillSweep,
+                    useCenter  = false,
+                    topLeft    = topLeft,
+                    size       = arcSize,
+                    style      = Stroke(stroke, cap = StrokeCap.Round)
+                )
+
+                // ── Glowing tip dot ───────────────────────────────────────
+                val tipAngleRad = Math.toRadians((startAngle + fillSweep).toDouble()).toFloat()
+                val cx          = topLeft.x + diameter / 2f
+                val cy          = topLeft.y + diameter / 2f
+                val r           = diameter / 2f
+                val tipX        = cx + r * kotlin.math.cos(tipAngleRad)
+                val tipY        = cy + r * kotlin.math.sin(tipAngleRad)
+
+                // Outer glow
+                drawCircle(
+                    color  = FlameYellow.copy(alpha = shimmerAlpha * 0.35f),
+                    radius = stroke * 1.4f,
+                    center = Offset(tipX, tipY)
+                )
+                // Inner bright dot
+                drawCircle(
+                    color  = PureWhite.copy(alpha = shimmerAlpha),
+                    radius = stroke * 0.5f,
+                    center = Offset(tipX, tipY)
+                )
+            }
+        }
+
+        // ── Content slot (timer lives here) ──────────────────────────────
+        content()
+
+        // ── Floating milestone badge ──────────────────────────────────────
+        if (showBadge) {
+            Box(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (badgeOffsetY - 20).dp)
+                    .graphicsLayer { alpha = badgeAlpha }
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(
+                        Brush.horizontalGradient(listOf(FlameOrange, FlameYellow))
+                    )
+                    .border(1.dp, PureWhite.copy(0.3f), RoundedCornerShape(20.dp))
+                    .padding(horizontal = 12.dp, vertical = 5.dp)
+            ) {
+                Text(
+                    "+${milestoneKcal} kcal 🔥",
+                    fontSize   = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color      = PureWhite
+                )
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  TOP STATS BOX — only the timer section changed, everything else identical
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun TopStatsBox(
@@ -465,64 +635,41 @@ private fun TopStatsBox(
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // ── Top row: app name + mode chip + live badge ────────────────────
+        // ── Top row — unchanged ───────────────────────────────────────────
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            // CaloriX brand chip
             Column {
-                Text(
-                    "CaloriX",
-                    color         = PureWhite,
-                    fontSize      = 18.sp,
-                    fontWeight    = FontWeight.Bold,
-                    letterSpacing = (-0.5).sp
-                )
-                Box(
-                    Modifier
-                        .width(36.dp).height(2.dp)
-                        .background(
-                            Brush.horizontalGradient(listOf(AccentViolet, HoloPink)),
-                            RoundedCornerShape(1.dp)
-                        )
-                )
+                Text("CaloriX", color = PureWhite, fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp)
+                Box(Modifier.width(36.dp).height(2.dp)
+                    .background(Brush.horizontalGradient(listOf(AccentViolet, HoloPink)), RoundedCornerShape(1.dp)))
             }
-
-            // Mode chip
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(GlassWhite)
-                    .border(1.dp, GlassBorder, RoundedCornerShape(50))
+                modifier = Modifier.clip(RoundedCornerShape(50))
+                    .background(GlassWhite).border(1.dp, GlassBorder, RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment     = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(modeIcon[workoutMode] ?: "🏃", fontSize = 13.sp)
-                Text(
-                    workoutMode, color = TextPrimary,
-                    fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.5.sp
-                )
+                Text(workoutMode, color = TextPrimary, fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp, letterSpacing = 1.5.sp)
             }
-
-            // Live / Paused badge
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
+                modifier = Modifier.clip(RoundedCornerShape(50))
                     .background(badgeColor.copy(0.12f))
                     .border(1.dp, badgeColor.copy(0.4f), RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment     = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 PulsingDot(badgeColor)
-                Text(
-                    if (isPaused) "PAUSED" else "LIVE",
+                Text(if (isPaused) "PAUSED" else "LIVE",
                     color = badgeColor, fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp, letterSpacing = 2.sp
-                )
+                    fontSize = 10.sp, letterSpacing = 2.sp)
             }
         }
 
@@ -535,67 +682,67 @@ private fun TopStatsBox(
                 .border(1.dp, GlassBorder, RoundedCornerShape(24.dp))
         ) {
             // Shimmer top edge
-            Box(
-                Modifier.fillMaxWidth().height(1.dp).align(Alignment.TopCenter)
-                    .background(
-                        Brush.horizontalGradient(listOf(Color.Transparent, PureWhite.copy(0.15f), Color.Transparent))
-                    )
-            )
-            // Violet glow behind timer
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .size(180.dp)
-                    .drawBehind {
-                        drawCircle(
-                            Brush.radialGradient(
-                                listOf(AccentViolet.copy(glowAlpha), Color.Transparent)
-                            ),
-                            size.minDimension
-                        )
-                    }
-            )
+            Box(Modifier.fillMaxWidth().height(1.dp).align(Alignment.TopCenter)
+                .background(Brush.horizontalGradient(
+                    listOf(Color.Transparent, PureWhite.copy(0.15f), Color.Transparent))))
+
+            // Original violet glow behind timer — kept, ring adds on top
+            Box(modifier = Modifier.align(Alignment.TopCenter).size(180.dp)
+                .drawBehind {
+                    drawCircle(Brush.radialGradient(
+                        listOf(AccentViolet.copy(glowAlpha), Color.Transparent)), size.minDimension)
+                })
 
             Column(
                 modifier            = Modifier.fillMaxWidth().padding(vertical = 20.dp, horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                Text(
-                    "DURATION",
-                    color = TextMuted, fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold, letterSpacing = 2.sp
-                )
+                Text("DURATION", color = TextMuted, fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
 
-                // Timer — uses violet accent instead of neon green
-                val timerScale by animateFloatAsState(
-                    if (!isPaused && seconds % 2 == 0) 1.010f else 1f,
-                    tween(500), label = "tp"
-                )
-                Text(
-                    formatTime(seconds),
-                    color         = PureWhite,
-                    fontSize      = 54.sp,
-                    fontWeight    = FontWeight.W200,
-                    letterSpacing = 4.sp,
-                    modifier      = Modifier.scale(timerScale)
-                )
-
-                // Gradient divider
-                Box(
-                    Modifier.fillMaxWidth(0.85f).height(1.dp)
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(Color.Transparent, AccentViolet.copy(0.4f), HoloPink.copy(0.3f), Color.Transparent)
-                            )
-                        )
-                )
-
-                // 3 stats row
-                Row(
-                    modifier              = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                // ── ★ FLAME RING wraps the timer ──────────────────────────
+                CalorieFlameRing(
+                    calories    = calories,
+                    ringSize    = 188.dp,
+                    strokeWidth = 9.dp
                 ) {
+                    // Timer inside the ring — identical to original
+                    val timerScale by animateFloatAsState(
+                        if (!isPaused && seconds % 2 == 0) 1.010f else 1f,
+                        tween(500), label = "tp"
+                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier            = Modifier.align(Alignment.Center)
+                    ) {
+                        Text(
+                            formatTime(seconds),
+                            color         = PureWhite,
+                            fontSize      = 42.sp,           // slightly reduced to fit ring (was 54)
+                            fontWeight    = FontWeight.W200,
+                            letterSpacing = 2.sp,
+                            modifier      = Modifier.scale(timerScale)
+                        )
+                        // Calorie sub-label under timer inside ring
+                        Text(
+                            "${calories.toInt()} kcal 🔥",
+                            color      = FlameYellow.copy(0.85f),
+                            fontSize   = 11.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                // ── END FLAME RING ────────────────────────────────────────
+
+                // Gradient divider — unchanged
+                Box(Modifier.fillMaxWidth(0.85f).height(1.dp)
+                    .background(Brush.horizontalGradient(
+                        listOf(Color.Transparent, AccentViolet.copy(0.4f), HoloPink.copy(0.3f), Color.Transparent))))
+
+                // 3 stats row — unchanged
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly) {
                     WorkoutStatItem(label = "DISTANCE", value = String.format("%.2f", distanceKm), unit = "km")
                     Box(Modifier.width(1.dp).height(48.dp).background(GlassBorder))
                     WorkoutStatItem(label = "PACE",     value = pace,                               unit = "min/km")
@@ -608,7 +755,7 @@ private fun TopStatsBox(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  STAT ITEM
+//  STAT ITEM — unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun WorkoutStatItem(label: String, value: String, unit: String) {
@@ -617,72 +764,47 @@ private fun WorkoutStatItem(label: String, value: String, unit: String) {
         verticalArrangement = Arrangement.spacedBy(2.dp),
         modifier            = Modifier.width(90.dp)
     ) {
-        Text(label, color = TextMuted, fontSize = 8.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp, textAlign = TextAlign.Center)
+        Text(label, color = TextMuted, fontSize = 8.sp, fontWeight = FontWeight.Bold,
+            letterSpacing = 1.5.sp, textAlign = TextAlign.Center)
         AnimatedContent(
-            targetState  = value,
-            transitionSpec = {
-                (slideInVertically { -16 } + fadeIn()) togetherWith (slideOutVertically { 16 } + fadeOut())
-            },
+            targetState   = value,
+            transitionSpec = { (slideInVertically { -16 } + fadeIn()) togetherWith (slideOutVertically { 16 } + fadeOut()) },
             label = "sv"
         ) { v ->
-            Text(
-                v,
-                color      = AccentViolet,   // ← CaloriX violet instead of NeonGreen
-                fontSize   = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign  = TextAlign.Center
-            )
+            Text(v, color = AccentViolet, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         }
         Text(unit, color = TextMuted, fontSize = 8.sp, textAlign = TextAlign.Center)
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  BOTTOM CONTROLS
+//  BOTTOM CONTROLS — unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun BottomControls(isPaused: Boolean, onPause: () -> Unit, onStop: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding()
             .padding(horizontal = 20.dp, vertical = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment     = Alignment.CenterVertically
     ) {
-        // Stop button
-        WorkoutControlButton(
-            label    = "■",
-            sublabel = "STOP",
-            color    = ErrorRed,
-            modifier = Modifier.weight(1f),
-            onClick  = onStop
-        )
-        // Pause / Resume — violet gradient when resumed, pink when paused
-        WorkoutPauseButton(
-            isPaused = isPaused,
-            onClick  = onPause,
-            modifier = Modifier.weight(1.6f)
-        )
+        WorkoutControlButton(label = "■", sublabel = "STOP", color = ErrorRed,
+            modifier = Modifier.weight(1f), onClick = onStop)
+        WorkoutPauseButton(isPaused = isPaused, onClick = onPause, modifier = Modifier.weight(1.6f))
     }
 }
 
 @Composable
 private fun WorkoutPauseButton(isPaused: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val scale       by animateFloatAsState(if (isPaused) 1.04f else 1f, spring(Spring.DampingRatioMediumBouncy), label = "ps")
-    val bgBrush     = if (isPaused)
-        Brush.linearGradient(listOf(AccentViolet, HoloPink))
-    else
-        Brush.linearGradient(listOf(AccentViolet.copy(0.15f), HoloPink.copy(0.1f)))
+    val scale   by animateFloatAsState(if (isPaused) 1.04f else 1f, spring(Spring.DampingRatioMediumBouncy), label = "ps")
+    val bgBrush = if (isPaused) Brush.linearGradient(listOf(AccentViolet, HoloPink))
+    else Brush.linearGradient(listOf(AccentViolet.copy(0.15f), HoloPink.copy(0.1f)))
     val textColor   by animateColorAsState(if (isPaused) PureWhite else AccentViolet, tween(300), label = "pt")
-    val borderBrush = if (isPaused)
-        Brush.linearGradient(listOf(AccentViolet, HoloPink))
-    else
-        Brush.linearGradient(listOf(AccentViolet.copy(0.5f), HoloPink.copy(0.3f)))
+    val borderBrush = if (isPaused) Brush.linearGradient(listOf(AccentViolet, HoloPink))
+    else Brush.linearGradient(listOf(AccentViolet.copy(0.5f), HoloPink.copy(0.3f)))
 
     Box(
-        modifier = modifier
-            .scale(scale).height(64.dp).clip(RoundedCornerShape(20.dp))
+        modifier = modifier.scale(scale).height(64.dp).clip(RoundedCornerShape(20.dp))
             .background(bgBrush)
             .border(1.5.dp, borderBrush, RoundedCornerShape(20.dp))
             .clickable(remember { MutableInteractionSource() }, ripple(color = AccentViolet)) { onClick() },
@@ -690,10 +812,8 @@ private fun WorkoutPauseButton(isPaused: Boolean, onClick: () -> Unit, modifier:
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(if (isPaused) "▶" else "⏸", color = textColor, fontSize = 22.sp)
-            Text(
-                if (isPaused) "RESUME" else "PAUSE",
-                color = textColor, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp
-            )
+            Text(if (isPaused) "RESUME" else "PAUSE", color = textColor, fontSize = 10.sp,
+                fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
         }
     }
 }
@@ -707,10 +827,8 @@ private fun WorkoutControlButton(
     val scale by animateFloatAsState(if (pressed) 0.93f else 1f, spring(Spring.DampingRatioMediumBouncy), label = "bs")
 
     Box(
-        modifier = modifier
-            .scale(scale).height(64.dp).clip(RoundedCornerShape(20.dp))
-            .background(color.copy(0.12f))
-            .border(1.dp, color.copy(0.4f), RoundedCornerShape(20.dp))
+        modifier = modifier.scale(scale).height(64.dp).clip(RoundedCornerShape(20.dp))
+            .background(color.copy(0.12f)).border(1.dp, color.copy(0.4f), RoundedCornerShape(20.dp))
             .clickable(remember { MutableInteractionSource() }, ripple(color = color)) { pressed = true; onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -719,20 +837,17 @@ private fun WorkoutControlButton(
             Text(sublabel, color = color, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
         }
     }
+    LaunchedEffect(pressed) { if (pressed) { delay(200); pressed = false } }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  CENTER FAB  — glass style matching HomeFragment map overlay
+//  CENTER FAB — unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun CenterFab(onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(
-                Brush.radialGradient(listOf(AccentViolet.copy(0.3f), HeaderDark))
-            )
+        modifier = Modifier.size(48.dp).clip(CircleShape)
+            .background(Brush.radialGradient(listOf(AccentViolet.copy(0.3f), HeaderDark)))
             .border(1.dp, AccentViolet.copy(0.5f), CircleShape)
             .clickable(remember { MutableInteractionSource() }, ripple(color = AccentViolet)) { onClick() },
         contentAlignment = Alignment.Center
@@ -742,15 +857,12 @@ private fun CenterFab(onClick: () -> Unit) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  PULSING DOT
+//  PULSING DOT — unchanged
 // ═══════════════════════════════════════════════════════════════════════════════
 @Composable
 private fun PulsingDot(color: Color) {
     val inf   = rememberInfiniteTransition(label = "dot")
-    val alpha by inf.animateFloat(
-        1f, 0.2f,
-        infiniteRepeatable(tween(800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "da"
-    )
+    val alpha by inf.animateFloat(1f, 0.2f,
+        infiniteRepeatable(tween(800, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "da")
     Box(Modifier.size(6.dp).clip(CircleShape).background(color.copy(alpha = alpha)))
 }

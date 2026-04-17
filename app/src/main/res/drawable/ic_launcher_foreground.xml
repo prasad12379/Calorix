@@ -4,7 +4,28 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Outer Circle -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,36 C44,36 36,44 36,54 C36,64 44,72 54,72 C64,72 72,64 72,54 C72,44 64,36 54,36Z" />
+        android:pathData="M54,12 A42,42 0 1,1 53.9,12Z"/>
+
+    <!-- Flame Shape (Calories) -->
+    <path
+        android:fillColor="#FF7043"
+        android:pathData="M54,30
+                          C48,40 44,46 44,54
+                          C44,64 50,70 54,70
+                          C58,70 64,64 64,54
+                          C64,46 60,40 54,30Z"/>
+
+    <!-- Inner Water Drop -->
+    <path
+        android:fillColor="#42A5F5"
+        android:pathData="M54,44
+                          C50,50 48,54 48,58
+                          C48,63 51,66 54,66
+                          C57,66 60,63 60,58
+                          C60,54 58,50 54,44Z"/>
+
 </vector>

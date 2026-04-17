@@ -10,9 +10,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
-    @GET("chat")
+    // ── Chatbot — now passes email for personalized context ──────────────
+    @GET("chat")   // or whatever your endpoint is
     fun getFitnessResponse(
-        @Query("prompt") prompt: String
+        @Query("prompt") prompt: String,
+        @Query("email")  email:  String
     ): Call<MyData>
 
     // ✅ Signup API (NEW)
